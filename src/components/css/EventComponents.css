@@ -1,0 +1,516 @@
+/* Event Card Styles */
+.event-card {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid #e9ecef;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  transform-origin: center;
+}
+
+.event-card:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  border-color: #007bff;
+}
+
+/* Remove default hover transform since we handle it in wrapper */
+.carousel-item-wrapper .event-card:hover {
+  transform: none;
+}
+
+/* Ensure buttons are always visible when card is hovered */
+.carousel-item-hovered .event-card .btn {
+  z-index: 15;
+  position: relative;
+  transform: none;
+}
+
+.carousel-item-hovered .event-card .card-body {
+  z-index: 12;
+  position: relative;
+}
+
+/* Enhanced button visibility and effects when card is hovered */
+.carousel-item-hovered .event-card .btn {
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+}
+
+.carousel-item-hovered .event-card .btn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0, 123, 255, 0.4);
+}
+
+/* Ensure card content doesn't get clipped */
+.carousel-item-wrapper {
+  overflow: visible;
+}
+
+.carousel-item-hovered {
+  overflow: visible;
+}
+
+.event-thumbnail {
+  overflow: hidden;
+  border-radius: 0.375rem 0.375rem 0 0;
+}
+
+.event-thumbnail img {
+  transition: transform 0.3s ease;
+}
+
+.event-card:hover .event-thumbnail img {
+  transform: scale(1.05);
+}
+
+/* Event Carousel Styles */
+.event-carousel {
+  position: relative;
+  overflow: hidden;
+}
+
+.event-carousel .carousel-container {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+}
+
+.event-carousel .carousel-item {
+  flex: 0 0 auto;
+  width: 100%;
+}
+
+/* Single row carousel */
+.carousel-single-row {
+  display: flex;
+  overflow-x: hidden;
+  overflow-y: visible;
+  scroll-behavior: smooth;
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  padding: 20px 0;
+}
+
+.carousel-container {
+  display: flex;
+  gap: 1.5rem;
+  align-items: stretch;
+  overflow: visible;
+}
+
+.carousel-single-row .carousel-item {
+  flex: 0 0 auto;
+  min-width: 300px;
+  max-width: 400px;
+}
+
+.carousel-single-row .carousel-item:last-child {
+  margin-right: 0;
+}
+
+/* Carousel item wrapper for hover effects */
+.carousel-item-wrapper {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center;
+  z-index: 1;
+}
+
+.carousel-item-wrapper:hover {
+  z-index: 10;
+}
+
+.carousel-item-hovered {
+  transform: scale(1.1);
+  z-index: 10;
+}
+
+.carousel-item-dimmed {
+  opacity: 0.6;
+  transform: scale(0.95);
+}
+
+/* Navigation Buttons */
+.carousel-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  width: 50px;
+  height: 50px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  color: #007bff;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.carousel-nav-btn:hover {
+  background: #007bff;
+  color: white;
+  transform: translateY(-50%) scale(1.05);
+  box-shadow: 0 6px 24px rgba(0, 123, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.carousel-nav-btn:active {
+  transform: translateY(-50%) scale(0.98);
+}
+
+.carousel-nav-left {
+  left: 15px;
+}
+
+.carousel-nav-right {
+  right: 15px;
+}
+
+/* Hide buttons when disabled */
+.carousel-nav-btn:disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Event List Styles */
+.events-page {
+  min-height: 100vh;
+}
+
+.events-filter {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 123, 255, 0.1);
+}
+
+.events-search {
+  position: relative;
+}
+
+.events-search .search-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+}
+
+.events-search input {
+  padding-left: 2.5rem;
+  border-radius: 12px;
+  border: 2px solid #e3f2fd;
+  transition: all 0.3s ease;
+}
+
+.events-search input:focus {
+  border-color: #1976d2;
+  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+}
+
+/* Time Filter Styles */
+.time-filter-container {
+  background: white;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.time-filter-label {
+  color: #495057;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+}
+
+.time-filter-buttons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.time-filter-btn {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1.25rem;
+  border: 2px solid #e3f2fd;
+  background: white;
+  color: #1976d2;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  min-width: 140px;
+  justify-content: center;
+}
+
+.time-filter-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.5s;
+}
+
+.time-filter-btn:hover::before {
+  left: 100%;
+}
+
+.time-filter-btn:hover {
+  background: #e3f2fd;
+  border-color: #1976d2;
+  color: #1565c0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(25, 118, 210, 0.15);
+}
+
+.time-filter-btn.active {
+  background: linear-gradient(135deg, #1976d2, #1565c0);
+  border-color: #1976d2;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(25, 118, 210, 0.25);
+}
+
+.time-filter-btn.active:hover {
+  background: linear-gradient(135deg, #1565c0, #0d47a1);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(25, 118, 210, 0.3);
+}
+
+.time-filter-btn i {
+  font-size: 1rem;
+}
+
+/* Modern Pagination Styles */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 2.5rem;
+  flex-wrap: wrap;
+  padding: 1rem 0;
+}
+
+.pagination-btn {
+  min-width: 44px;
+  height: 44px;
+  border: 2px solid #e3f2fd;
+  background: white;
+  color: #1976d2;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
+}
+
+.pagination-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.5s;
+}
+
+.pagination-btn:hover::before {
+  left: 100%;
+}
+
+.pagination-btn:hover {
+  background: #e3f2fd;
+  border-color: #1976d2;
+  color: #1565c0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(25, 118, 210, 0.15);
+}
+
+.pagination-btn.active {
+  background: linear-gradient(135deg, #1976d2, #1565c0);
+  border-color: #1976d2;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(25, 118, 210, 0.25);
+}
+
+.pagination-btn.active:hover {
+  background: linear-gradient(135deg, #1565c0, #0d47a1);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(25, 118, 210, 0.3);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #f5f5f5;
+  color: #bdbdbd;
+  border-color: #e0e0e0;
+  transform: none;
+  box-shadow: none;
+}
+
+.pagination-btn:disabled:hover {
+  background: #f5f5f5;
+  border-color: #e0e0e0;
+  color: #bdbdbd;
+  transform: none;
+  box-shadow: none;
+}
+
+.pagination-btn:disabled::before {
+  display: none;
+}
+
+/* Navigation arrows styling */
+.pagination-btn.arrow {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.pagination-btn.arrow:hover {
+  background: #1976d2;
+  color: white;
+  border-color: #1976d2;
+}
+
+.pagination-btn.arrow:disabled {
+  opacity: 0.3;
+  background: #fafafa;
+  color: #e0e0e0;
+  border-color: #f0f0f0;
+}
+
+/* Status Badge Styles */
+.status-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-upcoming {
+  background-color: #28a745;
+  color: white;
+}
+
+.status-ongoing {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.status-finished {
+  background-color: #6c757d;
+  color: white;
+}
+
+.status-cancelled {
+  background-color: #dc3545;
+  color: white;
+}
+
+/* Loading States */
+.events-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+.events-loading .spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+
+/* Empty States */
+.events-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #6c757d;
+}
+
+.events-empty i {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.events-empty h4 {
+  margin-bottom: 0.5rem;
+  color: #495057;
+}
+
+.events-empty p {
+  margin-bottom: 0;
+}
+
+/* Animation Classes */
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-in-left {
+  animation: slideInLeft 0.5s ease-out;
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.slide-in-right {
+  animation: slideInRight 0.5s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

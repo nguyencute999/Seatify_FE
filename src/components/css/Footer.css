@@ -1,0 +1,149 @@
+.footer {
+  background-color: #1f2937;
+  color: white;
+  margin-top: auto;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.footer-section {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Branding Section */
+.branding-section {
+  max-width: 300px;
+}
+
+.footer .brand-name {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0 0 1rem 0;
+  color: white;
+}
+
+.brand-description {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #d1d5db;
+  margin: 0 0 1.5rem 0;
+}
+
+.social-media {
+  display: flex;
+  gap: 1rem;
+}
+
+.social-icon {
+  width: 40px;
+  height: 40px;
+  border: 2px solid white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: white;
+  transition: all 0.3s ease;
+  font-size: 1.2rem;
+}
+
+.social-icon:hover {
+  background-color: white;
+  color: #1f2937;
+  transform: translateY(-2px);
+}
+
+.social-icon.facebook:hover {
+  background-color: #1877f2;
+  color: white;
+}
+
+.social-icon.tik-tok:hover {
+  background-color: #000000;
+  color: white;
+}
+
+/* Section Titles */
+.footer .section-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin: 0 0 1rem 0;
+  color: white;
+}
+
+/* Footer Links */
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-links li {
+  margin-bottom: 0.5rem;
+}
+
+.footer-links a {
+  color: #d1d5db;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: white;
+}
+
+/* Contact Info */
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  color: #d1d5db;
+}
+
+.contact-icon {
+  font-size: 1rem;
+  width: 20px;
+  color: white;
+  flex-shrink: 0;
+}
+
+/* Footer Bottom */
+.footer-bottom {
+  margin-top: 2rem;
+}
+
+.footer-divider {
+  border: none;
+  height: 1px;
+  background-color: #374151;
+  margin: 0 0 1rem 0;
+}
+
+.copyright {
+  text-align: center;
+  font-size: 0.85rem;
+  color: #9ca3af;
+  margin: 0;
+}
+

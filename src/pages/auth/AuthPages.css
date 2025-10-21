@@ -1,0 +1,289 @@
+/* Auth Pages Styles */
+.login-page,
+.register-page,
+.forgot-password-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.login-container,
+.register-container,
+.forgot-password-container {
+  width: 100%;
+  max-width: 500px;
+}
+
+.login-card,
+.register-card,
+.forgot-password-card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  animation: slideUp 0.6s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Header Styles */
+.login-header,
+.register-header,
+.forgot-password-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.login-title,
+.register-title,
+.forgot-password-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 10px;
+}
+
+.login-subtitle,
+.register-subtitle,
+.forgot-password-subtitle {
+  color: #718096;
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Form Styles */
+.login-form,
+.register-form,
+.forgot-password-form {
+  width: 100%;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #f8fafc;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #667eea;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Button Styles */
+.btn-login,
+.btn-register,
+.btn-forgot,
+.btn-reset {
+  width: 100%;
+  padding: 14px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 10px;
+  border: none;
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+}
+
+.btn-primary:disabled {
+  opacity: 0.7;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Social Login */
+.divider {
+  text-align: center;
+  margin: 20px 0;
+  position: relative;
+}
+
+.divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #e2e8f0;
+}
+
+.divider span {
+  background: white;
+  padding: 0 20px;
+  color: #718096;
+  font-size: 0.9rem;
+}
+
+.social-login {
+  margin-bottom: 20px;
+}
+
+.btn-social {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-danger {
+  border: 2px solid #e53e3e;
+  color: #e53e3e;
+  background: white;
+}
+
+.btn-outline-danger:hover {
+  background: #e53e3e;
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Links */
+.forgot-password-link,
+.register-link,
+.login-link,
+.back-to-login-link,
+.back-to-email-link {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.forgot-password-link:hover,
+.register-link:hover,
+.login-link:hover,
+.back-to-login-link:hover,
+.back-to-email-link:hover {
+  color: #764ba2;
+  text-decoration: none;
+}
+
+.back-to-login-link,
+.back-to-email-link {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .login-page,
+  .register-page,
+  .forgot-password-page {
+    padding: 10px;
+  }
+  
+  .login-card,
+  .register-card,
+  .forgot-password-card {
+    padding: 30px 20px;
+    border-radius: 15px;
+  }
+  
+  .login-title,
+  .register-title,
+  .forgot-password-title {
+    font-size: 1.5rem;
+  }
+  
+  .form-control {
+    padding: 10px 14px;
+  }
+  
+  .btn-login,
+  .btn-register,
+  .btn-forgot,
+  .btn-reset {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-card,
+  .register-card,
+  .forgot-password-card {
+    padding: 20px 15px;
+  }
+  
+  .login-title,
+  .register-title,
+  .forgot-password-title {
+    font-size: 1.3rem;
+  }
+}
+
+/* Loading State */
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Success/Error States */
+.text-success {
+  color: #38a169 !important;
+}
+
+.text-danger {
+  color: #e53e3e !important;
+}
+
+.text-muted {
+  color: #718096 !important;
+}
+
+/* Animation for form steps */
+.forgot-password-form {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
