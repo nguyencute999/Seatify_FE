@@ -65,7 +65,8 @@ export const getGoogleLoginUrl = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get('/auth/google-login');
-      return response.data.redirectUrl;
+      // Backend returns ResponseWrapper with data containing AuthRedirectResponse
+      return response.data.data.redirectUrl;
     } catch (err) {
       return rejectWithValue(err.response?.data || { message: 'Server error' });
     }
@@ -78,10 +79,11 @@ export const googleLoginWithCode = createAsyncThunk(
   async ({ code, redirectUri }, { rejectWithValue }) => {
     try {
       const response = await api.post('/auth/google/code', { code, redirectUri });
+      // Backend returns ResponseWrapper with data containing OAuth2ResponseDTO
       return {
-        token: response.data.accessToken,
-        roles: response.data.roles,
-        email: response.data.email,
+        token: response.data.data.accessToken,
+        roles: response.data.data.roles,
+        email: '', // Email not returned in OAuth2ResponseDTO
       };
     } catch (err) {
       return rejectWithValue(err.response?.data || { message: 'Server error' });

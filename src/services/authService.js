@@ -45,7 +45,8 @@ const authService = {
   getGoogleLoginUrl: async () => {
     try {
       const response = await api.get('/auth/google-login');
-      return response.data;
+      // Backend returns ResponseWrapper with data.redirectUrl
+      return response.data?.data?.redirectUrl || response.data;
     } catch (error) {
       throw error.response?.data || error;
     }
