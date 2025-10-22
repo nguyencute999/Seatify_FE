@@ -15,7 +15,7 @@ const ForgotPasswordPage = () => {
   const navigate = useNavigate();
   const { loading, error, message } = useSelector(state => state.auth);
 
-  const [step, setStep] = useState(1); // 1: nhập email, 2: nhập OTP + mật khẩu mới
+  const [step, setStep] = useState(1); 
   const [email, setEmail] = useState('');
   const [resetData, setResetData] = useState({
     otp: '',
@@ -40,7 +40,7 @@ const ForgotPasswordPage = () => {
       dispatch(clearMessage());
       
       if (step === 1) {
-        setStep(2); // Chuyển sang bước 2 sau khi gửi OTP thành công
+        setStep(2); 
       } else if (step === 2) {
         // Reset thành công, chuyển về trang login
         setTimeout(() => {

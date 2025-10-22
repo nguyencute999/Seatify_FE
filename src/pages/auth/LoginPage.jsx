@@ -154,6 +154,12 @@ const LoginPage = () => {
                 Đăng ký ngay
               </Link>
             </div>
+
+            <div className="text-center mt-3">
+              <Link to="/" className="back-home-link">
+                ← Quay lại trang chủ
+              </Link>
+            </div>
           </form>
         </div>
       </div>

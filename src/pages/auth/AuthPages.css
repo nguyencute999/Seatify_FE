@@ -183,7 +183,8 @@
 .register-link,
 .login-link,
 .back-to-login-link,
-.back-to-email-link {
+.back-to-email-link,
+.back-home-link {
   color: #667eea;
   text-decoration: none;
   font-weight: 600;
@@ -194,7 +195,8 @@
 .register-link:hover,
 .login-link:hover,
 .back-to-login-link:hover,
-.back-to-email-link:hover {
+.back-to-email-link:hover,
+.back-home-link:hover {
   color: #764ba2;
   text-decoration: none;
 }

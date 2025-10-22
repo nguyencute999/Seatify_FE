@@ -401,6 +401,17 @@
   border-radius: 0; /* square */
   overflow: visible;
   box-shadow: none;
+  position: relative;
+}
+
+.team-decoration {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .team-name {
@@ -467,4 +478,146 @@
   font-size: 1.1rem;
   opacity: 0.9;
 }
+
+/* Mentor Section */
+.mentor-section {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1.75rem 0 2rem; /* smaller spacing when inside team section */
+}
+
+.mentor-card {
+  position: relative;
+  width: 100%;
+  max-width: 700px; /* smaller card */
+  background: #ffffff;
+  border-radius: 1.25rem; /* slightly larger than others */
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  padding: 1.75rem 1.5rem 2rem; /* tighter padding */
+  isolation: isolate; /* keep bg effects inside */
+}
+
+/* Gradient border via pseudo-element */
+.mentor-card::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  z-index: -1;
+  filter: drop-shadow(0 0 0 rgba(0,0,0,0));
+}
+
+/* Subtle inner border to keep white edge clean */
+.mentor-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(#ffffff, #ffffff);
+  z-index: -1;
+}
+
+.mentor-star {
+  position: absolute;
+  top: -10px; /* slightly above frame */
+  left: -10px; /* top-left corner */
+  width: 32px;
+  height: 32px;
+  transform-origin: 50% 50%;
+  transition: filter 0.3s ease;
+}
+
+.mentor-bg {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.mentor-badge {
+  text-align: center;
+  font-weight: 800;
+  font-size: 1.25rem;
+  margin-bottom: 1.25rem;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+
+.mentor-avatar {
+  width: 140px;
+  height: 140px;
+  margin: 0 auto 1rem;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(59, 130, 246, 0.18);
+  position: relative;
+}
+
+.mentor-avatar::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(59,130,246,0.8), rgba(139,92,246,0.8));
+  filter: blur(18px);
+  z-index: -1;
+}
+
+/* Overlay to tint towards the background theme and add a soft vignette */
+.mentor-avatar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 120% at 50% 60%, rgba(17,24,39,0) 55%, rgba(17,24,39,0.22) 100%),
+    linear-gradient(135deg, rgba(59,130,246,0.15), rgba(139,92,246,0.15));
+  mix-blend-mode: multiply;
+}
+
+.mentor-avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: saturate(1.05) contrast(1.03) brightness(0.98);
+}
+
+.mentor-name {
+  text-align: center;
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0.25rem 0 0.25rem;
+}
+
+.mentor-role {
+  text-align: center;
+  color: #6b7280;
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Hover interactions */
+.mentor-card:hover::before {
+  filter: drop-shadow(0 0 12px rgba(99,102,241,0.45));
+}
+
+.mentor-card:hover .mentor-star svg {
+  animation: mentor-star-spin 4s linear infinite;
+}
+
+@keyframes mentor-star-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 
