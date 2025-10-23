@@ -1,13 +1,16 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import EventCarousel from '../../components/EventCarousel';
 import { fetchEvents } from '../../redux/event/eventSlice';
 import '../css/HomePage.css';
 
-const Home = ({ user = null, onViewChange = () => {} }) => {
+const Home = ({ onViewChange = () => {} }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { token, userEmail } = useSelector(state => state.auth);
   const { 
     featuredEvents, 
     upcomingEvents, 
@@ -23,13 +26,21 @@ const Home = ({ user = null, onViewChange = () => {} }) => {
   const handleBookNow = (event) => {
     // TODO: Implement booking logic
     console.log('Book now:', event);
-    onViewChange('events');
+    navigate('/events');
   };
 
   const handleViewDetails = (event) => {
     // TODO: Navigate to event details
     console.log('View details:', event);
-    onViewChange('events');
+    navigate('/events');
+  };
+
+  const handleLogin = () => {
+    navigate('/login');
+  };
+
+  const handleAbout = () => {
+    navigate('/about');
   };
 
   return (
@@ -56,12 +67,12 @@ const Home = ({ user = null, onViewChange = () => {} }) => {
               </p>
               
               <div className="d-flex flex-wrap gap-3">
-                {user ? (
+                {token ? (
                   <>
                     <Button 
                       variant="light"
                       className="btn-lg px-4 py-3 hero-btn-primary"
-                      onClick={() => onViewChange('events')}
+                      onClick={() => navigate('/events')}
                     >
                       Xem sự kiện
                       <i className="bi bi-arrow-right ms-2"></i>
@@ -79,7 +90,7 @@ const Home = ({ user = null, onViewChange = () => {} }) => {
                     <Button 
                       variant="light"
                       className="btn-lg px-4 py-3 hero-btn-primary"
-                      onClick={() => onViewChange('login')}
+                      onClick={handleLogin}
                     >
                       Đăng ký ngay
                       <i className="bi bi-arrow-right ms-2"></i>
@@ -87,7 +98,7 @@ const Home = ({ user = null, onViewChange = () => {} }) => {
                     <Button 
                       variant="outline-light"
                       className="btn-lg px-4 py-3 hero-btn-secondary"
-                      onClick={() => onViewChange('about')}
+                      onClick={handleAbout}
                     >
                       Tìm hiểu thêm
                     </Button>
@@ -109,20 +120,20 @@ const Home = ({ user = null, onViewChange = () => {} }) => {
           title="Sự kiện nổi bật"
         />
 
-        {/* Upcoming Events */}
-        <EventCarousel
-          events={upcomingEvents}
-          onBookNow={handleBookNow}
-          onViewDetails={handleViewDetails}
-          title="Sắp diễn ra"
-        />
-
         {/* Ongoing Events */}
         <EventCarousel
           events={ongoingEvents}
           onBookNow={handleBookNow}
           onViewDetails={handleViewDetails}
           title="Đang diễn ra"
+        />
+
+        {/* Upcoming Events */}
+        <EventCarousel
+          events={upcomingEvents}
+          onBookNow={handleBookNow}
+          onViewDetails={handleViewDetails}
+          title="Sắp diễn ra"
         />
 
         {/* Finished Events */}

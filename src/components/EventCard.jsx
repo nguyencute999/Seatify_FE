@@ -9,7 +9,7 @@ const EventCard = ({ event, onBookNow, onViewDetails, showBookButton = true }) =
   const navigate = useNavigate();
 
   const handleViewDetails = () => {
-    navigate(`/events/${event.event_id}`);
+    navigate(`/events/${event.eventId}`);
   };
   const getStatusBadge = (status) => {
     const statusConfig = {
@@ -47,7 +47,7 @@ const EventCard = ({ event, onBookNow, onViewDetails, showBookButton = true }) =
         <div className="event-thumbnail">
           <img 
             src={event.thumbnail} 
-            alt={event.event_name}
+            alt={event.eventName}
             className="card-img-top"
             style={{ height: '200px', objectFit: 'cover' }}
           />
@@ -59,22 +59,22 @@ const EventCard = ({ event, onBookNow, onViewDetails, showBookButton = true }) =
           {getStatusBadge(event.status)}
         </div>
         
-        <CardTitle className="h5 mb-3 text-truncate" title={event.event_name}>
-          {event.event_name}
+        <CardTitle className="h5 mb-3 text-truncate" title={event.eventName}>
+          {event.eventName}
         </CardTitle>
         
         <div className="mb-3">
           <div className="d-flex align-items-center mb-2">
             <i className="bi bi-calendar-event me-2 text-primary"></i>
             <small className="text-muted">
-              {formatDateTime(event.start_time)}
+              {formatDateTime(event.startTime)}
             </small>
           </div>
           
           <div className="d-flex align-items-center mb-2">
             <i className="bi bi-clock me-2 text-primary"></i>
             <small className="text-muted">
-              {formatDateTime(event.end_time)}
+              {formatDateTime(event.endTime)}
             </small>
           </div>
           

@@ -1,12 +1,23 @@
 import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { 
+  fetchAdminEvents, 
+  createAdminEvent, 
+  updateAdminEvent, 
+  deleteAdminEvent,
+  clearAdminError,
+  updateAdminEventStatus
+} from '../../redux/event/eventSlice';
 
 const ManageEvents = () => {
-  const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+  const { adminEvents } = useSelector(state => state.events);
+  
   const [showModal, setShowModal] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
+  const [successMessage, setSuccessMessage] = useState('');
 
   const [formData, setFormData] = useState({
     eventName: '',
@@ -18,70 +29,16 @@ const ManageEvents = () => {
     thumbnail: ''
   });
 
-  // Mock data - sẽ thay thế bằng API calls thực tế
+  // Load events from API
   useEffect(() => {
-    setTimeout(() => {
-      setEvents([
-        {
-          id: 1,
-          eventName: 'Seminar AI & Machine Learning',
-          description: 'Hội thảo về trí tuệ nhân tạo và học máy trong thời đại 4.0',
-          startTime: '2024-01-20T09:00:00',
-          endTime: '2024-01-20T17:00:00',
-          location: 'Hội trường A, Tòa nhà FPT',
-          capacity: 100,
-          booked: 85,
-          status: 'UPCOMING',
-          thumbnail: '/images/event1.jpg',
-          createdBy: 'Admin',
-          createdAt: '2024-01-10T10:00:00'
-        },
-        {
-          id: 2,
-          eventName: 'Workshop React Development',
-          description: 'Workshop thực hành phát triển ứng dụng web với React',
-          startTime: '2024-01-18T14:00:00',
-          endTime: '2024-01-18T18:00:00',
-          location: 'Phòng Lab 301',
-          capacity: 50,
-          booked: 50,
-          status: 'ONGOING',
-          thumbnail: '/images/event2.jpg',
-          createdBy: 'Admin',
-          createdAt: '2024-01-08T15:30:00'
-        },
-        {
-          id: 3,
-          eventName: 'Conference Blockchain Technology',
-          description: 'Hội nghị về công nghệ blockchain và ứng dụng thực tế',
-          startTime: '2024-01-16T08:00:00',
-          endTime: '2024-01-16T16:00:00',
-          location: 'Trung tâm Hội nghị Quốc gia',
-          capacity: 200,
-          booked: 180,
-          status: 'UPCOMING',
-          thumbnail: '/images/event3.jpg',
-          createdBy: 'Admin',
-          createdAt: '2024-01-05T09:15:00'
-        },
-        {
-          id: 4,
-          eventName: 'Tech Talk: Cloud Computing',
-          description: 'Buổi chia sẻ về điện toán đám mây và xu hướng công nghệ',
-          startTime: '2024-01-12T19:00:00',
-          endTime: '2024-01-12T21:00:00',
-          location: 'Online - Zoom',
-          capacity: 500,
-          booked: 320,
-          status: 'FINISHED',
-          thumbnail: '/images/event4.jpg',
-          createdBy: 'Admin',
-          createdAt: '2024-01-01T14:20:00'
-        }
-      ]);
-      setLoading(false);
-    }, 1000);
-  }, []);
+    dispatch(fetchAdminEvents({
+      name: searchTerm,
+      page: 0,
+      size: 9999,
+      sortBy: 'eventId',
+      desc: false
+    }));
+  }, [dispatch, searchTerm]);
 
   const getStatusBadge = (status) => {
     const badges = {
@@ -135,55 +92,98 @@ const ManageEvents = () => {
     setShowModal(true);
   };
 
-  const handleSaveEvent = (e) => {
+  const handleSaveEvent = async (e) => {
     e.preventDefault();
     
-    if (editingEvent) {
-      // Update existing event
-      setEvents(prev => prev.map(event => 
-        event.id === editingEvent.id 
-          ? { ...event, ...formData, capacity: parseInt(formData.capacity) }
-          : event
-      ));
-    } else {
-      // Create new event
-      const newEvent = {
-        id: Date.now(),
-        ...formData,
-        capacity: parseInt(formData.capacity),
-        booked: 0,
-        status: 'UPCOMING',
-        createdBy: 'Admin',
-        createdAt: new Date().toISOString()
-      };
-      setEvents(prev => [newEvent, ...prev]);
+    try {
+      if (editingEvent) {
+        // Update existing event
+        await dispatch(updateAdminEvent({
+          eventId: editingEvent.eventId,
+          eventData: {
+            eventName: formData.eventName,
+            description: formData.description,
+            startTime: formData.startTime,
+            endTime: formData.endTime,
+            location: formData.location,
+            capacity: parseInt(formData.capacity),
+            thumbnail: formData.thumbnail
+          }
+        })).unwrap();
+      } else {
+        // Create new event
+        await dispatch(createAdminEvent({
+          eventName: formData.eventName,
+          description: formData.description,
+          startTime: formData.startTime,
+          endTime: formData.endTime,
+          location: formData.location,
+          capacity: parseInt(formData.capacity),
+          thumbnail: formData.thumbnail,
+          status: 'UPCOMING'
+        })).unwrap();
+      }
+      
+      setShowModal(false);
+      setSuccessMessage(editingEvent ? 'Cập nhật sự kiện thành công!' : 'Tạo sự kiện thành công!');
+      setTimeout(() => setSuccessMessage(''), 3000);
+      // Refresh events list
+      dispatch(fetchAdminEvents({
+        name: searchTerm,
+        page: 0,
+        size: 9999,
+        sortBy: 'eventId',
+        desc: false
+      }));
+    } catch (error) {
+      console.error('Error saving event:', error);
     }
-    
-    setShowModal(false);
   };
 
-  const handleDeleteEvent = (eventId) => {
+  const handleDeleteEvent = async (eventId) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa sự kiện này?')) {
-      setEvents(prev => prev.filter(event => event.id !== eventId));
+      try {
+        await dispatch(deleteAdminEvent(eventId)).unwrap();
+        setSuccessMessage('Xóa sự kiện thành công!');
+        setTimeout(() => setSuccessMessage(''), 3000);
+        // Refresh events list
+        dispatch(fetchAdminEvents({
+          name: searchTerm,
+          page: 0,
+          size: 9999,
+          sortBy: 'eventId',
+          desc: false
+        }));
+      } catch (error) {
+        console.error('Error deleting event:', error);
+      }
     }
   };
 
-  const handleStatusChange = (eventId, newStatus) => {
-    setEvents(prev => prev.map(event => 
-      event.id === eventId 
-        ? { ...event, status: newStatus }
-        : event
-    ));
+  const handleStatusChange = async (eventId, newStatus) => {
+    try {
+      await dispatch(updateAdminEvent({
+        eventId: eventId,
+        eventData: { status: newStatus }
+      })).unwrap();
+      
+      // Update local state immediately for better UX
+      dispatch(updateAdminEventStatus({ eventId, status: newStatus }));
+      setSuccessMessage('Cập nhật trạng thái thành công!');
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (error) {
+      console.error('Error updating event status:', error);
+    }
   };
 
-  const filteredEvents = events.filter(event => {
+  const filteredEvents = adminEvents.data.filter(event => {
     const matchesSearch = event.eventName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          event.location.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'ALL' || event.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
-  if (loading) {
+  if (adminEvents.loading) {
     return (
       <div className="d-flex justify-content-center align-items-center" style={{ height: '400px' }}>
         <div className="spinner-border text-primary" role="status">
@@ -195,6 +195,30 @@ const ManageEvents = () => {
 
   return (
     <div className="manage-events">
+      {/* Success Alert */}
+      {successMessage && (
+        <div className="alert alert-success alert-dismissible fade show" role="alert">
+          <strong>Thành công:</strong> {successMessage}
+          <button 
+            type="button" 
+            className="btn-close" 
+            onClick={() => setSuccessMessage('')}
+          ></button>
+        </div>
+      )}
+
+      {/* Error Alert */}
+      {adminEvents.error && (
+        <div className="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>Lỗi:</strong> {adminEvents.error}
+          <button 
+            type="button" 
+            className="btn-close" 
+            onClick={() => dispatch(clearAdminError())}
+          ></button>
+        </div>
+      )}
+
       {/* Header */}
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
@@ -272,7 +296,7 @@ const ManageEvents = () => {
               </thead>
               <tbody>
                 {filteredEvents.map(event => (
-                  <tr key={event.id}>
+                  <tr key={event.eventId}>
                     <td>
                       <img
                         src={event.thumbnail || '/images/default-event.jpg'}
@@ -298,14 +322,8 @@ const ManageEvents = () => {
                     <td>{event.location}</td>
                     <td>
                       <div>
-                        <div className="fw-bold">{event.booked}/{event.capacity}</div>
-                        <div className="progress" style={{ height: '8px' }}>
-                          <div 
-                            className="progress-bar" 
-                            role="progressbar" 
-                            style={{ width: `${(event.booked / event.capacity) * 100}%` }}
-                          ></div>
-                        </div>
+                        <div className="fw-bold">{event.capacity}</div>
+                        <small className="text-muted">Sức chứa</small>
                       </div>
                     </td>
                     <td>
@@ -341,7 +359,7 @@ const ManageEvents = () => {
                             <li>
                               <button 
                                 className="dropdown-item"
-                                onClick={() => handleStatusChange(event.id, 'UPCOMING')}
+                                onClick={() => handleStatusChange(event.eventId, 'UPCOMING')}
                               >
                                 Sắp diễn ra
                               </button>
@@ -349,7 +367,7 @@ const ManageEvents = () => {
                             <li>
                               <button 
                                 className="dropdown-item"
-                                onClick={() => handleStatusChange(event.id, 'ONGOING')}
+                                onClick={() => handleStatusChange(event.eventId, 'ONGOING')}
                               >
                                 Đang diễn ra
                               </button>
@@ -357,7 +375,7 @@ const ManageEvents = () => {
                             <li>
                               <button 
                                 className="dropdown-item"
-                                onClick={() => handleStatusChange(event.id, 'FINISHED')}
+                                onClick={() => handleStatusChange(event.eventId, 'FINISHED')}
                               >
                                 Đã kết thúc
                               </button>
@@ -365,7 +383,7 @@ const ManageEvents = () => {
                             <li>
                               <button 
                                 className="dropdown-item"
-                                onClick={() => handleStatusChange(event.id, 'CANCELLED')}
+                                onClick={() => handleStatusChange(event.eventId, 'CANCELLED')}
                               >
                                 Hủy sự kiện
                               </button>
@@ -374,7 +392,7 @@ const ManageEvents = () => {
                         </div>
                         <button
                           className="btn btn-sm btn-outline-danger"
-                          onClick={() => handleDeleteEvent(event.id)}
+                          onClick={() => handleDeleteEvent(event.eventId)}
                           title="Xóa"
                         >
                           <i className="bi bi-trash"></i>

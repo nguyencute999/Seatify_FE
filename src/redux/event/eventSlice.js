@@ -1,20 +1,109 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { mockEvents, getFeaturedEvents, getUpcomingEvents, getOngoingEvents, getFinishedEvents } from '../../data/mockEvents';
 import api from '../../services/apiService';
+import adminEventService from '../../services/adminEventService';
+import userEventService from '../../services/userEventService';
 
-// Async thunks for API calls (sẽ được implement sau)
+// Helper functions for filtering events
+const getFeaturedEvents = (events) => {
+  return events.filter(event => event.featured === true);
+};
+
+const getUpcomingEvents = (events) => {
+  const now = new Date();
+  return events.filter(event => {
+    const eventDate = new Date(event.startTime);
+    return eventDate > now && event.status === 'UPCOMING';
+  });
+};
+
+const getOngoingEvents = (events) => {
+  const now = new Date();
+  return events.filter(event => {
+    const startDate = new Date(event.startTime);
+    const endDate = new Date(event.endTime);
+    return startDate <= now && endDate >= now && event.status === 'ONGOING';
+  });
+};
+
+const getFinishedEvents = (events) => {
+  const now = new Date();
+  return events.filter(event => {
+    const eventDate = new Date(event.endTime);
+    return eventDate < now || event.status === 'FINISHED';
+  });
+};
+
+// Async thunks for API calls
 export const fetchEvents = createAsyncThunk(
   'events/fetchEvents',
   async (_, { rejectWithValue }) => {
     try {
-      // TODO: Thay thế bằng API call thực tế
-      // const response = await api.get('/events');
-      // return response.data;
-      
-      // Tạm thời return mock data
-      return mockEvents;
+      const response = await userEventService.getAllEvents();
+      // API trả về { content: [...] } nên cần lấy content
+      return response.content || response;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch events');
+    }
+  }
+);
+
+// Admin Events API calls
+export const fetchAdminEvents = createAsyncThunk(
+  'events/fetchAdminEvents',
+  async (params = {}, { rejectWithValue }) => {
+    try {
+      const response = await adminEventService.getAllEvents(params);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch admin events');
+    }
+  }
+);
+
+export const fetchAdminEventById = createAsyncThunk(
+  'events/fetchAdminEventById',
+  async (eventId, { rejectWithValue }) => {
+    try {
+      const response = await adminEventService.getEventById(eventId);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch event');
+    }
+  }
+);
+
+export const createAdminEvent = createAsyncThunk(
+  'events/createAdminEvent',
+  async (eventData, { rejectWithValue }) => {
+    try {
+      const response = await adminEventService.createEvent(eventData);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to create event');
+    }
+  }
+);
+
+export const updateAdminEvent = createAsyncThunk(
+  'events/updateAdminEvent',
+  async ({ eventId, eventData }, { rejectWithValue }) => {
+    try {
+      const response = await adminEventService.updateEvent(eventId, eventData);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to update event');
+    }
+  }
+);
+
+export const deleteAdminEvent = createAsyncThunk(
+  'events/deleteAdminEvent',
+  async (eventId, { rejectWithValue }) => {
+    try {
+      await adminEventService.deleteEvent(eventId);
+      return eventId;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to delete event');
     }
   }
 );
@@ -23,18 +112,10 @@ export const fetchEventById = createAsyncThunk(
   'events/fetchEventById',
   async (eventId, { rejectWithValue }) => {
     try {
-      // TODO: Thay thế bằng API call thực tế
-      // const response = await api.get(`/events/${eventId}`);
-      // return response.data;
-      
-      // Tạm thời return mock data
-      const event = mockEvents.find(e => e.event_id === parseInt(eventId));
-      if (!event) {
-        throw new Error('Event not found');
-      }
-      return event;
+      const response = await userEventService.getEventById(eventId);
+      return response;
     } catch (error) {
-      return rejectWithValue(error.message || 'Failed to fetch event');
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch event');
     }
   }
 );
@@ -43,19 +124,8 @@ export const createEvent = createAsyncThunk(
   'events/createEvent',
   async (eventData, { rejectWithValue }) => {
     try {
-      // TODO: Thay thế bằng API call thực tế
-      // const response = await api.post('/events', eventData);
-      // return response.data;
-      
-      // Tạm thời return mock data
-      const newEvent = {
-        event_id: mockEvents.length + 1,
-        ...eventData,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        created_by: 1 // Mock user ID
-      };
-      return newEvent;
+      const response = await api.post('/events', eventData);
+      return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to create event');
     }
@@ -66,24 +136,10 @@ export const updateEvent = createAsyncThunk(
   'events/updateEvent',
   async ({ eventId, eventData }, { rejectWithValue }) => {
     try {
-      // TODO: Thay thế bằng API call thực tế
-      // const response = await api.put(`/events/${eventId}`, eventData);
-      // return response.data;
-      
-      // Tạm thời return mock data
-      const eventIndex = mockEvents.findIndex(e => e.event_id === parseInt(eventId));
-      if (eventIndex === -1) {
-        throw new Error('Event not found');
-      }
-      
-      const updatedEvent = {
-        ...mockEvents[eventIndex],
-        ...eventData,
-        updated_at: new Date().toISOString()
-      };
-      return updatedEvent;
+      const response = await api.put(`/events/${eventId}`, eventData);
+      return response.data;
     } catch (error) {
-      return rejectWithValue(error.message || 'Failed to update event');
+      return rejectWithValue(error.response?.data?.message || 'Failed to update event');
     }
   }
 );
@@ -92,18 +148,10 @@ export const deleteEvent = createAsyncThunk(
   'events/deleteEvent',
   async (eventId, { rejectWithValue }) => {
     try {
-      // TODO: Thay thế bằng API call thực tế
-      // await api.delete(`/events/${eventId}`);
-      // return eventId;
-      
-      // Tạm thời return mock data
-      const event = mockEvents.find(e => e.event_id === parseInt(eventId));
-      if (!event) {
-        throw new Error('Event not found');
-      }
+      await api.delete(`/events/${eventId}`);
       return eventId;
     } catch (error) {
-      return rejectWithValue(error.message || 'Failed to delete event');
+      return rejectWithValue(error.response?.data?.message || 'Failed to delete event');
     }
   }
 );
@@ -122,6 +170,18 @@ const initialState = {
     totalPages: 1,
     totalItems: 0,
     itemsPerPage: 6
+  },
+  // Admin events state
+  adminEvents: {
+    data: [],
+    loading: false,
+    error: null,
+    pagination: {
+      currentPage: 0,
+      totalPages: 0,
+      totalItems: 0,
+      size: 10
+    }
   }
 };
 
@@ -140,10 +200,25 @@ const eventSlice = createSlice({
     },
     updateEventStatus: (state, action) => {
       const { eventId, status } = action.payload;
-      const event = state.events.find(e => e.event_id === eventId);
+      const event = state.events.find(e => e.eventId === eventId);
       if (event) {
         event.status = status;
-        event.updated_at = new Date().toISOString();
+        event.updatedAt = new Date().toISOString();
+      }
+    },
+    // Admin events reducers
+    clearAdminError: (state) => {
+      state.adminEvents.error = null;
+    },
+    setAdminPagination: (state, action) => {
+      state.adminEvents.pagination = { ...state.adminEvents.pagination, ...action.payload };
+    },
+    updateAdminEventStatus: (state, action) => {
+      const { eventId, status } = action.payload;
+      const event = state.adminEvents.data.find(e => e.eventId === eventId);
+      if (event) {
+        event.status = status;
+        event.updatedAt = new Date().toISOString();
       }
     }
   },
@@ -211,7 +286,7 @@ const eventSlice = createSlice({
       })
       .addCase(updateEvent.fulfilled, (state, action) => {
         state.loading = false;
-        const index = state.events.findIndex(e => e.event_id === action.payload.event_id);
+        const index = state.events.findIndex(e => e.eventId === action.payload.eventId);
         if (index !== -1) {
           state.events[index] = action.payload;
         }
@@ -233,7 +308,7 @@ const eventSlice = createSlice({
       })
       .addCase(deleteEvent.fulfilled, (state, action) => {
         state.loading = false;
-        state.events = state.events.filter(e => e.event_id !== action.payload);
+        state.events = state.events.filter(e => e.eventId !== action.payload);
         // Update filtered lists
         state.featuredEvents = getFeaturedEvents(state.events);
         state.upcomingEvents = getUpcomingEvents(state.events);
@@ -245,6 +320,93 @@ const eventSlice = createSlice({
       .addCase(deleteEvent.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      
+      // Admin Events - Fetch All
+      .addCase(fetchAdminEvents.pending, (state) => {
+        state.adminEvents.loading = true;
+        state.adminEvents.error = null;
+      })
+      .addCase(fetchAdminEvents.fulfilled, (state, action) => {
+        state.adminEvents.loading = false;
+        state.adminEvents.data = action.payload.content || action.payload;
+        if (action.payload.totalPages !== undefined) {
+          state.adminEvents.pagination = {
+            currentPage: action.payload.number || 0,
+            totalPages: action.payload.totalPages || 0,
+            totalItems: action.payload.totalElements || 0,
+            size: action.payload.size || 10
+          };
+        }
+      })
+      .addCase(fetchAdminEvents.rejected, (state, action) => {
+        state.adminEvents.loading = false;
+        state.adminEvents.error = action.payload;
+      })
+      
+      // Admin Events - Fetch by ID
+      .addCase(fetchAdminEventById.pending, (state) => {
+        state.adminEvents.loading = true;
+        state.adminEvents.error = null;
+      })
+      .addCase(fetchAdminEventById.fulfilled, (state, action) => {
+        state.adminEvents.loading = false;
+        // Update the event in the list if it exists
+        const index = state.adminEvents.data.findIndex(e => e.eventId === action.payload.eventId);
+        if (index !== -1) {
+          state.adminEvents.data[index] = action.payload;
+        }
+      })
+      .addCase(fetchAdminEventById.rejected, (state, action) => {
+        state.adminEvents.loading = false;
+        state.adminEvents.error = action.payload;
+      })
+      
+      // Admin Events - Create
+      .addCase(createAdminEvent.pending, (state) => {
+        state.adminEvents.loading = true;
+        state.adminEvents.error = null;
+      })
+      .addCase(createAdminEvent.fulfilled, (state, action) => {
+        state.adminEvents.loading = false;
+        state.adminEvents.data.unshift(action.payload);
+        state.adminEvents.pagination.totalItems += 1;
+      })
+      .addCase(createAdminEvent.rejected, (state, action) => {
+        state.adminEvents.loading = false;
+        state.adminEvents.error = action.payload;
+      })
+      
+      // Admin Events - Update
+      .addCase(updateAdminEvent.pending, (state) => {
+        state.adminEvents.loading = true;
+        state.adminEvents.error = null;
+      })
+      .addCase(updateAdminEvent.fulfilled, (state, action) => {
+        state.adminEvents.loading = false;
+        const index = state.adminEvents.data.findIndex(e => e.eventId === action.payload.eventId);
+        if (index !== -1) {
+          state.adminEvents.data[index] = action.payload;
+        }
+      })
+      .addCase(updateAdminEvent.rejected, (state, action) => {
+        state.adminEvents.loading = false;
+        state.adminEvents.error = action.payload;
+      })
+      
+      // Admin Events - Delete
+      .addCase(deleteAdminEvent.pending, (state) => {
+        state.adminEvents.loading = true;
+        state.adminEvents.error = null;
+      })
+      .addCase(deleteAdminEvent.fulfilled, (state, action) => {
+        state.adminEvents.loading = false;
+        state.adminEvents.data = state.adminEvents.data.filter(e => e.eventId !== action.payload);
+        state.adminEvents.pagination.totalItems -= 1;
+      })
+      .addCase(deleteAdminEvent.rejected, (state, action) => {
+        state.adminEvents.loading = false;
+        state.adminEvents.error = action.payload;
       });
   }
 });
@@ -253,7 +415,10 @@ export const {
   clearError, 
   clearCurrentEvent, 
   setPagination, 
-  updateEventStatus 
+  updateEventStatus,
+  clearAdminError,
+  setAdminPagination,
+  updateAdminEventStatus
 } = eventSlice.actions;
 
 export default eventSlice.reducer;

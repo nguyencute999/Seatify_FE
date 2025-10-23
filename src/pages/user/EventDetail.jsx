@@ -151,11 +151,11 @@ const EventDetail = () => {
                   <div className="event-meta">
                     <div className="meta-item">
                       <i className="bi bi-calendar-event"></i>
-                      <span>{formatDate(currentEvent.start_time)}</span>
+                      <span>{formatDate(currentEvent.startTime)}</span>
                     </div>
                     <div className="meta-item">
                       <i className="bi bi-clock"></i>
-                      <span>{formatTime(currentEvent.start_time)} - {formatTime(currentEvent.end_time)}</span>
+                      <span>{formatTime(currentEvent.startTime)} - {formatTime(currentEvent.endTime)}</span>
                     </div>
                     {currentEvent.location && (
                       <div className="meta-item">
@@ -210,7 +210,7 @@ const EventDetail = () => {
                       <span>Bắt đầu</span>
                     </div>
                     <div className="schedule-details">
-                      <strong>{formatDateTime(currentEvent.start_time)}</strong>
+                      <strong>{formatDateTime(currentEvent.startTime)}</strong>
                     </div>
                   </div>
                   <div className="schedule-item">
@@ -219,7 +219,7 @@ const EventDetail = () => {
                       <span>Kết thúc</span>
                     </div>
                     <div className="schedule-details">
-                      <strong>{formatDateTime(currentEvent.end_time)}</strong>
+                      <strong>{formatDateTime(currentEvent.endTime)}</strong>
                     </div>
                   </div>
                 </div>
