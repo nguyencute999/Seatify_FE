@@ -185,8 +185,8 @@ const Header = () => {
                   <Link to="/profile/password" className="profile-menu-item" onClick={() => setIsMenuOpen(false)}>
                     <i className="bi bi-key me-2"></i>Đổi mật khẩu
                   </Link>
-                  <Link to="/profile/bookings" className="profile-menu-item" onClick={() => setIsMenuOpen(false)}>
-                    <i className="bi bi-clock-history me-2"></i>Lịch sử vé
+                  <Link to="/booking-history" className="profile-menu-item" onClick={() => setIsMenuOpen(false)}>
+                    <i className="bi bi-clock-history me-2"></i>Lịch sử đặt chỗ
                   </Link>
                   {roles.includes('ROLE_ADMIN') && (
                     <Link to="/admin/dashboard" className="profile-menu-item" onClick={() => setIsMenuOpen(false)}>

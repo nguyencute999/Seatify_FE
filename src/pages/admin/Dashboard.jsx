@@ -82,6 +82,7 @@ const Dashboard = () => {
         }
       ]);
 
+
       setLoading(false);
     }, 1000);
   }, []);
@@ -298,6 +299,7 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
 
       {/* Recent Activity */}
       <div className="row">

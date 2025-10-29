@@ -7,6 +7,9 @@ export default function UpdateProfile() {
     avatarUrl: '',
     phone: ''
   });
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
@@ -24,6 +27,7 @@ export default function UpdateProfile() {
             avatarUrl: data.avatarUrl || '',
             phone: data.phone || ''
           });
+          setAvatarPreview(data.avatarUrl || '');
         }
       } catch (err) {
         setError('Không thể tải thông tin hồ sơ');
@@ -42,6 +46,31 @@ export default function UpdateProfile() {
     }));
   };
 
+  // Handle file selection for avatar
+  const handleAvatarChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setAvatarFile(file);
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(file);
+      setAvatarPreview(previewUrl);
+    }
+  };
+
+  // Upload avatar and get URL
+  const uploadAvatar = async (file) => {
+    try {
+      setIsUploading(true);
+      const response = await userService.uploadAvatar(file);
+      return response.data; // This should be the image URL
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      throw error;
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const validateForm = () => {
     if (!formData.fullName.trim()) {
       return 'Vui lòng nhập họ và tên';
@@ -51,9 +80,6 @@ export default function UpdateProfile() {
     }
     if (formData.phone && !/^[0-9+\-\s()]+$/.test(formData.phone)) {
       return 'Số điện thoại không hợp lệ';
-    }
-    if (formData.avatarUrl && !/^https?:\/\/.+/.test(formData.avatarUrl)) {
-      return 'URL ảnh đại diện phải bắt đầu bằng http:// hoặc https://';
     }
     return null;
   };
@@ -71,15 +97,25 @@ export default function UpdateProfile() {
 
     setSubmitting(true);
     try {
+      let avatarUrl = formData.avatarUrl;
+      
+      // Upload avatar if a new file is selected
+      if (avatarFile) {
+        avatarUrl = await uploadAvatar(avatarFile);
+      }
+
       const payload = {
         fullName: formData.fullName.trim(),
-        avatarUrl: formData.avatarUrl.trim() || '',
+        avatarUrl: avatarUrl || '',
         phone: formData.phone.trim() || ''
       };
 
       const res = await userService.updateProfile(payload);
       const msg = res?.message || 'Cập nhật thông tin thành công';
       setMessage(msg);
+      
+      // Update the form data with the new avatar URL
+      setFormData(prev => ({ ...prev, avatarUrl }));
     } catch (err) {
       setError(err?.message || 'Cập nhật thông tin thất bại');
     } finally {
@@ -137,23 +173,25 @@ export default function UpdateProfile() {
         </div>
 
         <div className="mb-3">
-          <label htmlFor="avatarUrl" className="form-label">URL ảnh đại diện</label>
-          <input
-            type="url"
-            id="avatarUrl"
-            name="avatarUrl"
-            className="form-control"
-            value={formData.avatarUrl}
-            onChange={handleInputChange}
-            placeholder="https://example.com/avatar.jpg"
-          />
-          {formData.avatarUrl && (
+          <label htmlFor="avatar" className="form-label">Ảnh đại diện</label>
+          <div className="mb-2">
+            <input
+              type="file"
+              id="avatar"
+              name="avatar"
+              className="form-control"
+              accept="image/*"
+              onChange={handleAvatarChange}
+            />
+            <small className="text-muted">Chọn file hình ảnh (JPG, PNG, GIF)</small>
+          </div>
+          {avatarPreview && (
             <div className="mt-2">
               <small className="text-muted">Xem trước:</small>
               <div className="mt-1">
                 <img 
-                  src={formData.avatarUrl} 
-                  alt="Preview" 
+                  src={avatarPreview} 
+                  alt="Avatar preview" 
                   style={{ 
                     width: '60px', 
                     height: '60px', 
@@ -166,6 +204,14 @@ export default function UpdateProfile() {
                   }}
                 />
               </div>
+            </div>
+          )}
+          {isUploading && (
+            <div className="mt-2">
+              <div className="spinner-border spinner-border-sm me-2" role="status">
+                <span className="visually-hidden">Uploading...</span>
+              </div>
+              <small className="text-muted">Đang tải lên ảnh đại diện...</small>
             </div>
           )}
         </div>

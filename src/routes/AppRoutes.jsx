@@ -8,10 +8,11 @@ import ProtectedRoute from '../components/ProtectedRoute';
 import Home from '../pages/user/HomePage';
 import Events from '../pages/user/Events';
 import EventDetail from '../pages/user/EventDetail';
+import SeatSelection from '../pages/user/SeatSelection';
+import EventSeatLayout from '../pages/user/EventSeatLayout';
 import Profile from '../pages/user/Profile';
 import UpdateProfile from '../pages/user/UpdateProfile';
 import ChangePassword from '../pages/user/ChangePassword';
-import BookingHistory from '../pages/user/BookingHistory';
 
 // Auth Pages
 import LoginPage from '../pages/auth/LoginPage';
@@ -22,14 +23,14 @@ import ForgotPasswordPage from '../pages/auth/ForgotPasswordPage';
 import AdminLayout from '../layouts/AdminLayout';
 import Dashboard from '../pages/admin/Dashboard';
 import ManageEvents from '../pages/admin/ManageEvents';
+import ManageSeatLayouts from '../pages/admin/ManageSeatLayouts';
+import SeatLayout from '../pages/admin/SeatLayout';
 import ManageUsers from '../pages/admin/ManageUsers';
 import ManageBookings from '../pages/admin/ManageBookings';
 import Reports from '../pages/admin/Reports';
 
-// Temporary placeholders until real pages are implemented
-function NewsPage() {
-  return <div style={{ padding: 24 }}>News page</div>;
-}
+// Import NewsPage component
+import NewsPage from '../pages/NewsPage';
 
 export default function AppRoutes() {
   return (
@@ -44,6 +45,8 @@ export default function AppRoutes() {
         <Route index element={<Home />} />
         <Route path="events" element={<Events />} />
         <Route path="events/:eventId" element={<EventDetail />} />
+        <Route path="events/:eventId/seats" element={<SeatSelection />} />
+        <Route path="events/:eventId/seat-layout" element={<EventSeatLayout />} />
         <Route path="news" element={<NewsPage />} />
         <Route path="about" element={<AboutPage />} />
         <Route path="profile" element={
@@ -61,11 +64,6 @@ export default function AppRoutes() {
             <ChangePassword />
           </ProtectedRoute>
         } />
-        <Route path="profile/bookings" element={
-          <ProtectedRoute>
-            <BookingHistory />
-          </ProtectedRoute>
-        } />
       </Route>
       
       {/* Admin Routes */}
@@ -77,6 +75,8 @@ export default function AppRoutes() {
         <Route index element={<Dashboard />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="events" element={<ManageEvents />} />
+        <Route path="seat-layouts" element={<ManageSeatLayouts />} />
+        <Route path="events/:eventId/seats" element={<SeatLayout />} />
         <Route path="users" element={<ManageUsers />} />
         <Route path="bookings" element={<ManageBookings />} />
         <Route path="reports" element={<Reports />} />

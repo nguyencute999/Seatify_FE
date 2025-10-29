@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { 
   fetchAdminEvents, 
   createAdminEvent, 
@@ -8,9 +9,11 @@ import {
   clearAdminError,
   updateAdminEventStatus
 } from '../../redux/event/eventSlice';
+import adminEventService from '../../services/adminEventService';
 
 const ManageEvents = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { adminEvents } = useSelector(state => state.events);
   
   const [showModal, setShowModal] = useState(false);
@@ -26,8 +29,13 @@ const ManageEvents = () => {
     endTime: '',
     location: '',
     capacity: '',
+    seatsPerRow: '',
+    rows: '',
     thumbnail: ''
   });
+  const [thumbnailFile, setThumbnailFile] = useState(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
 
   // Load events from API
   useEffect(() => {
@@ -64,6 +72,36 @@ const ManageEvents = () => {
     return new Date(dateString).toLocaleString('vi-VN');
   };
 
+  // Helper function để tính capacity tự động
+  const calculateCapacity = (rows, seatsPerRow) => {
+    return parseInt(rows) * parseInt(seatsPerRow);
+  };
+
+  // Handle file selection for thumbnail
+  const handleThumbnailChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setThumbnailFile(file);
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(file);
+      setThumbnailPreview(previewUrl);
+    }
+  };
+
+  // Upload thumbnail and get URL
+  const uploadThumbnail = async (file) => {
+    try {
+      setIsUploading(true);
+      const response = await adminEventService.uploadThumbnail(file);
+      return response; // This should be the image URL
+    } catch (error) {
+      console.error('Error uploading thumbnail:', error);
+      throw error;
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const handleCreateEvent = () => {
     setEditingEvent(null);
     setFormData({
@@ -73,8 +111,12 @@ const ManageEvents = () => {
       endTime: '',
       location: '',
       capacity: '',
+      seatsPerRow: '',
+      rows: '',
       thumbnail: ''
     });
+    setThumbnailFile(null);
+    setThumbnailPreview('');
     setShowModal(true);
   };
 
@@ -87,15 +129,32 @@ const ManageEvents = () => {
       endTime: event.endTime.slice(0, 16),
       location: event.location,
       capacity: event.capacity.toString(),
+      seatsPerRow: event.seatsPerRow?.toString() || '',
+      rows: event.rows?.toString() || '',
       thumbnail: event.thumbnail
     });
+    setThumbnailFile(null);
+    setThumbnailPreview(event.thumbnail || '');
     setShowModal(true);
   };
 
   const handleSaveEvent = async (e) => {
     e.preventDefault();
-    
+
+    // Validation
+    if (!formData.rows || !formData.seatsPerRow) {
+      alert('Vui lòng nhập đầy đủ số hàng ghế và số ghế mỗi hàng!');
+      return;
+    }
+
     try {
+      let thumbnailUrl = formData.thumbnail;
+      
+      // Upload thumbnail if a new file is selected
+      if (thumbnailFile) {
+        thumbnailUrl = await uploadThumbnail(thumbnailFile);
+      }
+
       if (editingEvent) {
         // Update existing event
         await dispatch(updateAdminEvent({
@@ -107,21 +166,31 @@ const ManageEvents = () => {
             endTime: formData.endTime,
             location: formData.location,
             capacity: parseInt(formData.capacity),
-            thumbnail: formData.thumbnail
+            seatsPerRow: parseInt(formData.seatsPerRow),
+            rows: parseInt(formData.rows),
+            thumbnail: thumbnailUrl
           }
         })).unwrap();
       } else {
         // Create new event
-        await dispatch(createAdminEvent({
+        const eventData = {
           eventName: formData.eventName,
           description: formData.description,
           startTime: formData.startTime,
           endTime: formData.endTime,
           location: formData.location,
           capacity: parseInt(formData.capacity),
-          thumbnail: formData.thumbnail,
+          seatsPerRow: parseInt(formData.seatsPerRow),
+          rows: parseInt(formData.rows),
+          // Alternative field names that backend might expect
+          seatRows: parseInt(formData.rows),
+          numberOfRows: parseInt(formData.rows),
+          seatsPerRowCount: parseInt(formData.seatsPerRow),
+          thumbnail: thumbnailUrl,
           status: 'UPCOMING'
-        })).unwrap();
+        };
+        
+        await dispatch(createAdminEvent(eventData)).unwrap();
       }
       
       setShowModal(false);
@@ -137,6 +206,7 @@ const ManageEvents = () => {
       }));
     } catch (error) {
       console.error('Error saving event:', error);
+      alert('Có lỗi xảy ra khi lưu sự kiện. Vui lòng thử lại.');
     }
   };
 
@@ -347,6 +417,13 @@ const ManageEvents = () => {
                         >
                           <i className="bi bi-eye"></i>
                         </button>
+                        <button
+                          className="btn btn-sm btn-outline-warning"
+                          title="Quản lý ghế"
+                          onClick={() => navigate(`/admin/events/${event.eventId}/seats`)}
+                        >
+                          <i className="bi bi-grid-3x3-gap"></i>
+                        </button>
                         <div className="btn-group" role="group">
                           <button
                             className="btn btn-sm btn-outline-secondary dropdown-toggle"
@@ -452,6 +529,47 @@ const ManageEvents = () => {
                         onChange={(e) => setFormData(prev => ({ ...prev, capacity: e.target.value }))}
                         min="1"
                         required
+                        readOnly
+                        style={{ backgroundColor: '#f8f9fa' }}
+                      />
+                      <small className="text-muted">Tự động tính từ số hàng × số ghế mỗi hàng</small>
+                    </div>
+                    <div className="col-md-6 mb-3">
+                      <label className="form-label">Số hàng ghế *</label>
+                      <input
+                        type="number"
+                        className="form-control"
+                        value={formData.rows}
+                        onChange={(e) => {
+                          const rows = e.target.value;
+                          setFormData(prev => ({ 
+                            ...prev, 
+                            rows: rows,
+                            capacity: rows && prev.seatsPerRow ? calculateCapacity(rows, prev.seatsPerRow).toString() : prev.capacity
+                          }));
+                        }}
+                        min="1"
+                        max="50"
+                        required
+                      />
+                    </div>
+                    <div className="col-md-6 mb-3">
+                      <label className="form-label">Số ghế mỗi hàng *</label>
+                      <input
+                        type="number"
+                        className="form-control"
+                        value={formData.seatsPerRow}
+                        onChange={(e) => {
+                          const seatsPerRow = e.target.value;
+                          setFormData(prev => ({ 
+                            ...prev, 
+                            seatsPerRow: seatsPerRow,
+                            capacity: prev.rows && seatsPerRow ? calculateCapacity(prev.rows, seatsPerRow).toString() : prev.capacity
+                          }));
+                        }}
+                        min="1"
+                        max="50"
+                        required
                       />
                     </div>
                   </div>
@@ -501,14 +619,34 @@ const ManageEvents = () => {
                   </div>
 
                   <div className="mb-3">
-                    <label className="form-label">URL hình ảnh</label>
-                    <input
-                      type="url"
-                      className="form-control"
-                      value={formData.thumbnail}
-                      onChange={(e) => setFormData(prev => ({ ...prev, thumbnail: e.target.value }))}
-                      placeholder="https://example.com/image.jpg"
-                    />
+                    <label className="form-label">Hình ảnh sự kiện</label>
+                    <div className="mb-2">
+                      <input
+                        type="file"
+                        className="form-control"
+                        accept="image/*"
+                        onChange={handleThumbnailChange}
+                      />
+                      <small className="text-muted">Chọn file hình ảnh (JPG, PNG, GIF)</small>
+                    </div>
+                    {thumbnailPreview && (
+                      <div className="mt-2">
+                        <img
+                          src={thumbnailPreview}
+                          alt="Thumbnail preview"
+                          className="img-thumbnail"
+                          style={{ maxWidth: '200px', maxHeight: '150px' }}
+                        />
+                      </div>
+                    )}
+                    {isUploading && (
+                      <div className="mt-2">
+                        <div className="spinner-border spinner-border-sm me-2" role="status">
+                          <span className="visually-hidden">Uploading...</span>
+                        </div>
+                        <small className="text-muted">Đang tải lên hình ảnh...</small>
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="modal-footer">

@@ -1,0 +1,126 @@
+/* Seat Selection Page Styles */
+.seat-selection-page {
+  padding: 1rem;
+}
+
+.seat-selection-page .card {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border: none;
+}
+
+.seat-selection-page .card-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+/* Booking Summary */
+.booking-summary {
+  padding: 1rem 0;
+}
+
+.booking-summary h6 {
+  color: #495057;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.selected-seats {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+}
+
+.selected-seat-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+}
+
+.seat-info {
+  font-weight: 500;
+  color: #495057;
+}
+
+.seat-price {
+  color: #28a745;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.total-section {
+  border-top: 1px solid #dee2e6;
+  padding-top: 1rem;
+  font-size: 1.1rem;
+}
+
+/* Legend */
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.seat-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: white;
+}
+
+.seat-icon.available {
+  background-color: #28a745;
+}
+
+.seat-icon.locked {
+  background-color: #dc3545;
+}
+
+.seat-icon.booked {
+  background-color: #007bff;
+}
+
+.seat-icon.selected {
+  background-color: #ffc107;
+  color: #000;
+}
+
+/* Sticky positioning for booking summary */
+.sticky-top {
+  position: sticky;
+  top: 2rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .seat-selection-page {
+    padding: 0.5rem;
+  }
+  
+  .seat-selection-page .d-flex {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .sticky-top {
+    position: static;
+  }
+  
+  .selected-seats {
+    max-height: 200px;
+  }
+}

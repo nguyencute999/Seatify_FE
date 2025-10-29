@@ -66,7 +66,7 @@ const EventDetail = () => {
 
   const handleBookNow = () => {
     if (currentEvent?.status === 'UPCOMING') {
-      setShowBookingModal(true);
+      navigate(`/events/${eventId}/seats`);
     }
   };
 

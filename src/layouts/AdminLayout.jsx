@@ -27,6 +27,12 @@ const AdminLayout = () => {
       path: '/admin/events'
     },
     {
+      id: 'seat-layouts',
+      label: 'Quản lý sơ đồ ghế',
+      icon: 'bi bi-plus-circle',
+      path: '/admin/seat-layouts'
+    },
+    {
       id: 'users',
       label: 'Quản lý người dùng',
       icon: 'bi bi-people',

@@ -45,6 +45,19 @@ const adminEventService = {
   deleteEvent: async (id) => {
     const response = await api.delete(`/admin/events/${id}`);
     return response.data;
+  },
+
+  // Upload thumbnail cho sự kiện
+  uploadThumbnail: async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    const response = await api.post('/admin/events/upload-thumbnail', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
   }
 };
 

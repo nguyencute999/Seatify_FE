@@ -1,0 +1,196 @@
+/* User Seat Layout Styles */
+.user-seat-layout {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 2rem;
+  min-height: 500px;
+  position: relative;
+}
+
+/* Stage Area */
+.stage-area {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.stage {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  display: inline-block;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.stage i {
+  font-size: 1.5rem;
+  margin-right: 0.5rem;
+}
+
+/* Seats Container */
+.seats-container {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.seat-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.row-label {
+  min-width: 40px;
+  text-align: center;
+}
+
+.row-letter {
+  background: #6c757d;
+  color: white;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.seats-in-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Individual Seat */
+.seat {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  border: 2px solid transparent;
+  font-size: 0.7rem;
+  font-weight: bold;
+}
+
+.seat:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.seat.selected {
+  border-color: #ffc107;
+  box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.3);
+  background: #ffc107 !important;
+  color: #000 !important;
+}
+
+/* Seat States */
+.seat-available {
+  background: #28a745;
+  color: white;
+}
+
+.seat-available:hover {
+  background: #218838;
+}
+
+.seat-locked {
+  background: #dc3545;
+  color: white;
+  cursor: not-allowed;
+}
+
+.seat-locked:hover {
+  background: #c82333;
+  transform: none;
+}
+
+.seat-booked {
+  background: #007bff;
+  color: white;
+  cursor: not-allowed;
+}
+
+.seat-booked:hover {
+  background: #0056b3;
+  transform: none;
+}
+
+/* Seat Content */
+.seat i {
+  font-size: 1rem;
+  margin-bottom: 2px;
+}
+
+.seat-number {
+  font-size: 0.6rem;
+  line-height: 1;
+}
+
+.seat-price {
+  font-size: 0.5rem;
+  opacity: 0.8;
+  margin-top: 1px;
+}
+
+/* Instructions */
+.canvas-instructions {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #dee2e6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .user-seat-layout {
+    padding: 1rem;
+  }
+  
+  .seat {
+    width: 40px;
+    height: 40px;
+    font-size: 0.6rem;
+  }
+  
+  .seat i {
+    font-size: 0.8rem;
+  }
+  
+  .seat-number {
+    font-size: 0.5rem;
+  }
+  
+  .seat-price {
+    font-size: 0.4rem;
+  }
+  
+  .seats-in-row {
+    gap: 0.3rem;
+  }
+  
+  .seat-row {
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .seat {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .row-letter {
+    width: 25px;
+    height: 25px;
+    font-size: 0.8rem;
+  }
+}

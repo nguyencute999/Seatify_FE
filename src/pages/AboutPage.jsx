@@ -374,7 +374,7 @@ const AboutPage = () => {
               <img src={mentor} alt="Ảnh Mentor" className="mentor-avatar-image" />
             </div>
             <h3 className="mentor-name">Thầy Võ Thiên Ân</h3>
-            <p className="mentor-role">Mentor</p>
+            {/* <p className="mentor-role">Mentor</p> */}
           </div>
         </section>
 
