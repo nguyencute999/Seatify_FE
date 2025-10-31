@@ -23,8 +23,9 @@ const RegisterPage = () => {
     password: '',
     confirmPassword: ''
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Clear errors and messages when component mounts
   useEffect(() => {
     dispatch(clearError());
     dispatch(clearMessage());
@@ -75,7 +76,7 @@ const RegisterPage = () => {
         <div className="register-card">
           <div className="register-header">
             <h2 className="register-title">Tạo tài khoản SEATIFY</h2>
-            <p className="register-subtitle">Đăng ký để tham gia seminar</p>
+            <p className="register-subtitle">Đăng ký để tham gia sự kiện</p>
           </div>
 
           <form onSubmit={handleSubmit} className="register-form">
@@ -83,14 +84,14 @@ const RegisterPage = () => {
               <div className="col-md-6">
                 <div className="form-group">
                   <label htmlFor="mssv" className="form-label">
-                    Mã số sinh viên (MSSV)
+                    MSSV
                   </label>
                   <input
                     id="mssv"
                     name="mssv"
                     type="text"
                     className="form-control"
-                    placeholder="Ví dụ: SE123456"
+                    placeholder="Nhập MSSV"
                     value={formData.mssv}
                     onChange={handleInputChange}
                     required
@@ -107,7 +108,7 @@ const RegisterPage = () => {
                     name="fullName"
                     type="text"
                     className="form-control"
-                    placeholder="Nguyễn Văn A"
+                    placeholder="Nhập họ và tên"
                     value={formData.fullName}
                     onChange={handleInputChange}
                     required
@@ -127,7 +128,7 @@ const RegisterPage = () => {
                     name="email"
                     type="email"
                     className="form-control"
-                    placeholder="student@fpt.edu.vn"
+                    placeholder="Nhập địa chỉ email"
                     value={formData.email}
                     onChange={handleInputChange}
                     required
@@ -144,7 +145,7 @@ const RegisterPage = () => {
                     name="phone"
                     type="tel"
                     className="form-control"
-                    placeholder="0123456789"
+                    placeholder="Nhập số điện thoại"
                     value={formData.phone}
                     onChange={handleInputChange}
                     required
@@ -159,17 +160,32 @@ const RegisterPage = () => {
                   <label htmlFor="password" className="form-label">
                     Mật khẩu
                   </label>
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    className="form-control"
-                    placeholder="Tối thiểu 6 ký tự"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    required
-                    minLength={6}
-                  />
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      id="password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      className="form-control"
+                      placeholder="Tối thiểu 6 ký tự"
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      required
+                      minLength={6}
+                    />
+                    <span
+                      style={{
+                        position: 'absolute',
+                        right: '10px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        cursor: 'pointer',
+                        zIndex: 10
+                      }}
+                      onClick={() => setShowPassword((prev) => !prev)}
+                    >
+                      <i className={showPassword ? "bi bi-eye-slash" : "bi bi-eye"}></i>
+                    </span>
+                  </div>
                 </div>
               </div>
               <div className="col-md-6">
@@ -177,16 +193,31 @@ const RegisterPage = () => {
                   <label htmlFor="confirmPassword" className="form-label">
                     Xác nhận mật khẩu
                   </label>
-                  <input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type="password"
-                    className="form-control"
-                    placeholder="Nhập lại mật khẩu"
-                    value={formData.confirmPassword}
-                    onChange={handleInputChange}
-                    required
-                  />
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      className="form-control"
+                      placeholder="Nhập lại mật khẩu"
+                      value={formData.confirmPassword}
+                      onChange={handleInputChange}
+                      required
+                    />
+                    <span
+                      style={{
+                        position: 'absolute',
+                        right: '10px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        cursor: 'pointer',
+                        zIndex: 10
+                      }}
+                      onClick={() => setShowConfirmPassword((prev) => !prev)}
+                    >
+                      <i className={showConfirmPassword ? "bi bi-eye-slash" : "bi bi-eye"}></i>
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

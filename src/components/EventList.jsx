@@ -5,7 +5,7 @@ import { Input } from './ui/Input';
 import { Tabs } from './ui/Tabs';
 import './css/EventComponents.css';
 
-const EventList = ({ events, onBookNow, onViewDetails, loading = false }) => {
+const EventList = ({ events, onBookNow, onViewDetails, loading = false, pagination, onFiltersChange }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(6);
   const [searchTerm, setSearchTerm] = useState('');
@@ -14,54 +14,32 @@ const EventList = ({ events, onBookNow, onViewDetails, loading = false }) => {
   const [filteredEvents, setFilteredEvents] = useState(events);
 
   useEffect(() => {
-    let filtered = events;
+    // Update displayed events from current page content
+    setFilteredEvents(events);
+  }, [events]);
 
-    // Filter by search term
-    if (searchTerm) {
-      filtered = filtered.filter(event =>
-        event.event_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        event.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        event.location?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+  // Notify parent to fetch data from API when filters change
+  useEffect(() => {
+    if (typeof onFiltersChange === 'function') {
+      const params = {
+        name: searchTerm || '',
+        status: statusFilter === 'ALL' ? undefined : statusFilter,
+        time: timeFilter || 'ALL',
+        page: (currentPage - 1),
+        size: itemsPerPage,
+        sortBy: 'startTime',
+        desc: false
+      };
+      onFiltersChange(params);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchTerm, statusFilter, timeFilter, currentPage, itemsPerPage]);
 
-    // Filter by status
-    if (statusFilter !== 'ALL') {
-      filtered = filtered.filter(event => event.status === statusFilter);
-    }
-
-    // Filter by time (real-time filtering)
-    if (timeFilter !== 'ALL') {
-      const now = new Date();
-      
-      filtered = filtered.filter(event => {
-        const startTime = new Date(event.start_time);
-        const endTime = new Date(event.end_time);
-        
-        switch (timeFilter) {
-          case 'ONGOING':
-            // Đang diễn ra: thời gian hiện tại nằm trong khoảng bắt đầu - kết thúc
-            return now >= startTime && now <= endTime;
-          case 'UPCOMING':
-            // Sắp diễn ra: thời gian bắt đầu > thời gian hiện tại
-            return now < startTime;
-          case 'FINISHED':
-            // Đã kết thúc: thời gian kết thúc < thời gian hiện tại
-            return now > endTime;
-          default:
-            return true;
-        }
-      });
-    }
-
-    setFilteredEvents(filtered);
-    setCurrentPage(1); // Reset to first page when filters change
-  }, [events, searchTerm, statusFilter, timeFilter]);
-
-  const totalPages = Math.ceil(filteredEvents.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentEvents = filteredEvents.slice(startIndex, endIndex);
+  const totalPages = pagination?.totalPages || 1;
+  const totalItems = pagination?.totalItems ?? filteredEvents.length;
+  const startIndex = ((pagination?.currentPage || currentPage) - 1) * itemsPerPage;
+  const endIndex = startIndex + filteredEvents.length;
+  const currentEvents = filteredEvents;
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -136,31 +114,14 @@ const EventList = ({ events, onBookNow, onViewDetails, loading = false }) => {
     );
   };
 
-  if (loading) {
-    return (
-      <div className="container-fluid px-4 py-5">
-        <div className="row">
-          <div className="col-12">
-            <div className="text-center">
-              <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Loading...</span>
-              </div>
-              <p className="mt-3 text-muted">Đang tải sự kiện...</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="container-fluid px-4 py-5">
       <div className="row">
         <div className="col-12">
-          <div className="d-flex justify-content-between align-items-center mb-4">
+            <div className="d-flex justify-content-between align-items-center mb-4">
             <h2 className="mb-0">Danh sách sự kiện</h2>
             <div className="text-muted">
-              Hiển thị {startIndex + 1}-{Math.min(endIndex, filteredEvents.length)} trong {filteredEvents.length} sự kiện
+              Hiển thị {totalItems === 0 ? 0 : startIndex + 1}-{Math.min(endIndex, totalItems)} trong {totalItems} sự kiện
             </div>
           </div>
 

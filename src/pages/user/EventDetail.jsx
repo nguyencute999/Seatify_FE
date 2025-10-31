@@ -12,6 +12,7 @@ const EventDetail = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { currentEvent, loading, error } = useSelector(state => state.events);
+  const { token } = useSelector(state => state.auth); // <-- THÊM DÒNG NÀY
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [selectedSeat, setSelectedSeat] = useState(null);
 
@@ -65,6 +66,10 @@ const EventDetail = () => {
   };
 
   const handleBookNow = () => {
+    if (!token) {
+      navigate('/login');
+      return;
+    }
     if (currentEvent?.status === 'UPCOMING') {
       navigate(`/events/${eventId}/seats`);
     }

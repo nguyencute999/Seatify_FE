@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchAdminUsers, addAdminUser } from '../../redux/user/adminUserSlice';
 
 const ManageUsers = () => {
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+  const { users, loading, error, addLoading, addError, addSuccess } = useSelector((state) => state.adminUsers);
+  
   const [showModal, setShowModal] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [roleFilter, setRoleFilter] = useState('ALL');
-
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -17,107 +19,52 @@ const ManageUsers = () => {
     status: 'ACTIVE',
     roles: []
   });
-
+  // modal/form cho thêm user mới
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [formAddData, setFormAddData] = useState({
+    fullName: '',
+    email: '',
+    mssv: '',
+    phone: '',
+    password: '',
+    confirmPassword: '',
+    avatarFile: null,
+    roles: [],
+  });
   const availableRoles = [
     { id: 1, roleName: 'ROLE_USER', description: 'Người dùng thông thường' },
     { id: 2, roleName: 'ROLE_ADMIN', description: 'Quản trị viên' }
   ];
 
-  // Mock data - sẽ thay thế bằng API calls thực tế
   useEffect(() => {
-    setTimeout(() => {
-      setUsers([
-        {
-          id: 1,
-          fullName: 'Nguyễn Văn A',
-          email: 'nguyenvana@fpt.edu.vn',
-          mssv: 'SE123456',
-          phone: '0123456789',
-          status: 'ACTIVE',
-          verified: true,
-          authProvider: 'LOCAL',
-          roles: ['ROLE_USER'],
-          createdAt: '2024-01-01T10:00:00',
-          avatarUrl: '/images/avatar01.jpg'
-        },
-        {
-          id: 2,
-          fullName: 'Trần Thị B',
-          email: 'tranthib@fpt.edu.vn',
-          mssv: 'SE123457',
-          phone: '0987654321',
-          status: 'ACTIVE',
-          verified: true,
-          authProvider: 'GOOGLE',
-          roles: ['ROLE_USER'],
-          createdAt: '2024-01-02T14:30:00',
-          avatarUrl: '/images/avatar02.jpg'
-        },
-        {
-          id: 3,
-          fullName: 'Lê Văn C',
-          email: 'levanc@fpt.edu.vn',
-          mssv: 'SE123458',
-          phone: '0369852147',
-          status: 'INACTIVE',
-          verified: false,
-          authProvider: 'LOCAL',
-          roles: ['ROLE_USER'],
-          createdAt: '2024-01-03T09:15:00',
-          avatarUrl: null
-        },
-        {
-          id: 4,
-          fullName: 'Admin User',
-          email: 'admin@seatify.com',
-          mssv: null,
-          phone: '0123456789',
-          status: 'ACTIVE',
-          verified: true,
-          authProvider: 'LOCAL',
-          roles: ['ROLE_ADMIN'],
-          createdAt: '2024-01-01T08:00:00',
-          avatarUrl: null
-        }
-      ]);
-      setLoading(false);
-    }, 1000);
-  }, []);
+    dispatch(fetchAdminUsers());
+  }, [dispatch]);
+
+  // Mapping mới từ API: userId, fullName, email, ...
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = user.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+       user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+       (user.mssv && user.mssv.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesStatus = statusFilter === 'ALL' || user.status === statusFilter;
+    const matchesRole = roleFilter === 'ALL' || user.roles.includes(roleFilter);
+    return matchesSearch && matchesStatus && matchesRole;
+  });
 
   const getStatusBadge = (status) => {
-    const badges = {
-      'ACTIVE': 'badge bg-success',
-      'INACTIVE': 'badge bg-danger'
-    };
+    const badges = { 'ACTIVE': 'badge bg-success', 'INACTIVE': 'badge bg-danger' };
     return badges[status] || 'badge bg-secondary';
   };
-
   const getStatusText = (status) => {
-    const texts = {
-      'ACTIVE': 'Hoạt động',
-      'INACTIVE': 'Không hoạt động'
-    };
+    const texts = { 'ACTIVE': 'Hoạt động', 'INACTIVE': 'Không hoạt động' };
     return texts[status] || status;
   };
-
   const getAuthProviderBadge = (provider) => {
-    const badges = {
-      'LOCAL': 'badge bg-primary',
-      'GOOGLE': 'badge bg-danger'
-    };
+    const badges = { 'LOCAL': 'badge bg-primary', 'GOOGLE': 'badge bg-danger' };
     return badges[provider] || 'badge bg-secondary';
   };
-
   const getAuthProviderText = (provider) => {
-    const texts = {
-      'LOCAL': 'Tài khoản nội bộ',
-      'GOOGLE': 'Google'
-    };
+    const texts = { 'LOCAL': 'Tài khoản nội bộ', 'GOOGLE': 'Google' };
     return texts[provider] || provider;
-  };
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleString('vi-VN');
   };
 
   const handleEditUser = (user) => {
@@ -136,27 +83,33 @@ const ManageUsers = () => {
   const handleSaveUser = (e) => {
     e.preventDefault();
     
-    setUsers(prev => prev.map(user => 
-      user.id === editingUser.id 
-        ? { ...user, ...formData }
-        : user
-    ));
+    // This part needs to be updated to call an API to update the user
+    // For now, it will just update the local state, which won't persist
+    // setUsers(prev => prev.map(user => 
+    //   user.id === editingUser.id 
+    //     ? { ...user, ...formData }
+    //     : user
+    // ));
     
     setShowModal(false);
   };
 
   const handleDeleteUser = (userId) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa người dùng này?')) {
-      setUsers(prev => prev.filter(user => user.id !== userId));
+      // This part needs to be updated to call an API to delete the user
+      // For now, it will just update the local state, which won't persist
+      // setUsers(prev => prev.filter(user => user.id !== userId));
     }
   };
 
   const handleStatusToggle = (userId) => {
-    setUsers(prev => prev.map(user => 
-      user.id === userId 
-        ? { ...user, status: user.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE' }
-        : user
-    ));
+    // This part needs to be updated to call an API to update the user's status
+    // For now, it will just update the local state, which won't persist
+    // setUsers(prev => prev.map(user => 
+    //   user.id === userId 
+    //     ? { ...user, status: user.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE' }
+    //     : user
+    // ));
   };
 
   const handleRoleToggle = (roleName) => {
@@ -168,14 +121,57 @@ const ManageUsers = () => {
     }));
   };
 
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (user.mssv && user.mssv.toLowerCase().includes(searchTerm.toLowerCase()));
-    const matchesStatus = statusFilter === 'ALL' || user.status === statusFilter;
-    const matchesRole = roleFilter === 'ALL' || user.roles.includes(roleFilter);
-    return matchesSearch && matchesStatus && matchesRole;
-  });
+  // Mở modal thêm mới
+  const handleOpenAddModal = () => {
+    setFormAddData({
+      fullName: '', email: '', mssv: '', phone: '',
+      password: '', confirmPassword: '', avatarFile: null, roles: []
+    });
+    setShowAddModal(true);
+  };
+  // Đóng modal và reset
+  const handleCloseAddModal = () => {
+    setShowAddModal(false);
+    setFormAddData({
+      fullName: '', email: '', mssv: '', phone: '',
+      password: '', confirmPassword: '', avatarFile: null, roles: []
+    });
+  };
+  // Toggle role
+  const handleAddRoleToggle = (roleName) => {
+    setFormAddData(prev => ({
+      ...prev,
+      roles: prev.roles.includes(roleName)
+        ? prev.roles.filter(role => role !== roleName)
+        : [...prev.roles, roleName]
+    }));
+  };
+  // Submit tạo mới
+  const handleFileChange = (e) => {
+    setFormAddData(d => ({ ...d, avatarFile: e.target.files?.[0] || null }));
+  };
+  const handleAddUser = (e) => {
+    e.preventDefault();
+    // validate
+    if (!formAddData.fullName.trim() || !formAddData.email.trim() || !formAddData.password.trim() || !formAddData.confirmPassword.trim() || formAddData.roles.length === 0) {
+      alert('Vui lòng điền đủ các trường bắt buộc');
+      return;
+    }
+    if (formAddData.password !== formAddData.confirmPassword) {
+      alert('Xác nhận mật khẩu chưa đúng');
+      return;
+    }
+    dispatch(addAdminUser(formAddData)).then((res) => {
+      if (res.type.endsWith('fulfilled')) {
+        handleCloseAddModal();
+      }
+      // (Có thể show toast/info nếu muốn)
+    });
+  };
+  // Reset form nếu thêm thành công
+  useEffect(() => {
+    if (showAddModal && addSuccess) handleCloseAddModal();
+  }, [addSuccess]);
 
   if (loading) {
     return (
@@ -185,6 +181,9 @@ const ManageUsers = () => {
         </div>
       </div>
     );
+  }
+  if (error) {
+    return <div className="alert alert-danger">Lỗi: {error}</div>;
   }
 
   return (
@@ -200,7 +199,7 @@ const ManageUsers = () => {
             <i className="bi bi-download me-2"></i>
             Xuất Excel
           </button>
-          <button className="btn btn-primary">
+          <button className="btn btn-primary" onClick={handleOpenAddModal}>
             <i className="bi bi-person-plus me-2"></i>
             Thêm người dùng
           </button>
@@ -322,13 +321,12 @@ const ManageUsers = () => {
                   <th>Liên hệ</th>
                   <th>Trạng thái</th>
                   <th>Vai trò</th>
-                  <th>Ngày tạo</th>
                   <th>Thao tác</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredUsers.map(user => (
-                  <tr key={user.id}>
+                  <tr key={user.userId}>
                     <td>
                       <img
                         src={user.avatarUrl || '/images/default-avatar.jpg'}
@@ -375,7 +373,6 @@ const ManageUsers = () => {
                         ))}
                       </div>
                     </td>
-                    <td>{formatDate(user.createdAt)}</td>
                     <td>
                       <div className="btn-group" role="group">
                         <button
@@ -393,14 +390,14 @@ const ManageUsers = () => {
                         </button>
                         <button
                           className={`btn btn-sm ${user.status === 'ACTIVE' ? 'btn-outline-warning' : 'btn-outline-success'}`}
-                          onClick={() => handleStatusToggle(user.id)}
+                          onClick={() => handleStatusToggle(user.userId)}
                           title={user.status === 'ACTIVE' ? 'Vô hiệu hóa' : 'Kích hoạt'}
                         >
                           <i className={`bi bi-${user.status === 'ACTIVE' ? 'pause' : 'play'}`}></i>
                         </button>
                         <button
                           className="btn btn-sm btn-outline-danger"
-                          onClick={() => handleDeleteUser(user.id)}
+                          onClick={() => handleDeleteUser(user.userId)}
                           title="Xóa"
                         >
                           <i className="bi bi-trash"></i>
@@ -525,6 +522,74 @@ const ManageUsers = () => {
                   <button type="submit" className="btn btn-primary">
                     Cập nhật
                   </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ADD USER MODAL */}
+      {showAddModal && (
+        <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-lg">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Thêm người dùng mới</h5>
+                <button type="button" className="btn-close" onClick={handleCloseAddModal}></button>
+              </div>
+              <form onSubmit={handleAddUser}>
+                <div className="modal-body">
+                  {addError && <div className="alert alert-danger">{addError}</div>}
+                  <div className="mb-3">
+                    <label className="form-label">Họ và tên *</label>
+                    <input type="text" className="form-control" value={formAddData.fullName} onChange={e => setFormAddData(d => ({ ...d, fullName: e.target.value }))} required />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">Email *</label>
+                    <input type="email" className="form-control" value={formAddData.email} onChange={e => setFormAddData(d => ({ ...d, email: e.target.value }))} required />
+                  </div>
+                  <div className="row">
+                    <div className="col-md-6 mb-3">
+                      <label className="form-label">MSSV</label>
+                      <input type="text" className="form-control" value={formAddData.mssv} onChange={e => setFormAddData(d => ({ ...d, mssv: e.target.value }))} />
+                    </div>
+                    <div className="col-md-6 mb-3">
+                      <label className="form-label">Số điện thoại</label>
+                      <input type="text" className="form-control" value={formAddData.phone} onChange={e => setFormAddData(d => ({ ...d, phone: e.target.value }))} />
+                    </div>
+                  </div>
+                  <div className="row">
+                    <div className="col-md-6 mb-3">
+                      <label className="form-label">Mật khẩu *</label>
+                      <input type="password" className="form-control" value={formAddData.password} onChange={e => setFormAddData(d => ({ ...d, password: e.target.value }))} required />
+                    </div>
+                    <div className="col-md-6 mb-3">
+                      <label className="form-label">Xác nhận mật khẩu *</label>
+                      <input type="password" className="form-control" value={formAddData.confirmPassword} onChange={e => setFormAddData(d => ({ ...d, confirmPassword: e.target.value }))} required />
+                    </div>
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">Avatar (file ảnh)</label>
+                    <input type="file" className="form-control" onChange={handleFileChange} accept="image/*" />
+                    {formAddData.avatarFile && (
+                      <span className="text-success small">Đã chọn: {formAddData.avatarFile.name}</span>
+                    )}
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">Vai trò *</label>
+                    <div className="d-flex flex-wrap gap-2">
+                      {availableRoles.map(role => (
+                        <div key={role.id} className="form-check">
+                          <input className="form-check-input" type="checkbox" id={`addrole-${role.id}`} checked={formAddData.roles.includes(role.roleName)} onChange={() => handleAddRoleToggle(role.roleName)} />
+                          <label className="form-check-label" htmlFor={`addrole-${role.id}`}>{role.description}</label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-secondary" onClick={handleCloseAddModal}>Hủy</button>
+                  <button type="submit" className="btn btn-primary" disabled={addLoading}>{addLoading ? 'Đang lưu...' : 'Tạo mới'}</button>
                 </div>
               </form>
             </div>

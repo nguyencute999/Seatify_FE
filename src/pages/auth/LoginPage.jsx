@@ -20,17 +20,10 @@ const LoginPage = () => {
     password: ''
   });
 
-  // Clear errors and messages when component mounts
-  useEffect(() => {
-    dispatch(clearError());
-    dispatch(clearMessage());
-  }, [dispatch]);
-
   // Show toast notifications for errors and messages
   useEffect(() => {
     if (error) {
       toast.error(error);
-      dispatch(clearError());
     }
     if (message) {
       toast.success(message);
@@ -82,7 +75,7 @@ const LoginPage = () => {
         <div className="login-card">
           <div className="login-header">
             <h2 className="login-title">Chào mừng đến với SEATIFY</h2>
-            <p className="login-subtitle">Đăng nhập để tham gia seminar</p>
+            <p className="login-subtitle">Đăng nhập để tham gia sự kiện</p>
           </div>
 
           <form onSubmit={handleSubmit} className="login-form">
@@ -95,7 +88,7 @@ const LoginPage = () => {
                 name="email"
                 type="email"
                 className="form-control"
-                placeholder="student@fpt.edu.vn"
+                placeholder="Vui lòng nhập email"
                 value={formData.email}
                 onChange={handleInputChange}
                 required
@@ -116,6 +109,9 @@ const LoginPage = () => {
                 onChange={handleInputChange}
                 required
               />
+              {error && (
+                <div className="text-danger mt-2 small">{error}</div>
+              )}
             </div>
 
             <button 

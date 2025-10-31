@@ -125,14 +125,14 @@ export default function UpdateProfile() {
 
   if (loading) {
     return (
-      <div className="container py-4">
+      <div className="container py-4 d-flex flex-column align-items-center">
         <div className="alert alert-info">Đang tải thông tin...</div>
       </div>
     );
   }
 
   return (
-    <div className="container py-4">
+    <div className="container py-4 d-flex flex-column align-items-center">
       <h3 className="mb-3">Cập nhật thông tin</h3>
 
       {message && (
@@ -142,7 +142,7 @@ export default function UpdateProfile() {
         <div className="alert alert-danger" role="alert">{error}</div>
       )}
 
-      <form onSubmit={handleSubmit} className="card p-4" style={{ maxWidth: '600px' }}>
+      <form onSubmit={handleSubmit} className="card p-4 w-50" style={{ maxWidth: '640px' }}>
         <div className="mb-3">
           <label htmlFor="fullName" className="form-label">
             Họ và tên <span className="text-danger">*</span>

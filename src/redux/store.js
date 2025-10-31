@@ -5,6 +5,8 @@ import userReducer from './user/userSlice';
 import seatReducer from './seat/seatSlice';
 import bookingReducer from './booking/bookingSlice';
 import newsReducer from './news/newsSlice';
+import adminBookingReducer from './booking/adminBookingSlice';
+import adminUserReducer from './user/adminUserSlice';
 
 export const store = configureStore({
   reducer: {
@@ -14,5 +16,7 @@ export const store = configureStore({
     seats: seatReducer,
     booking: bookingReducer,
     news: newsReducer,
+    adminBookings: adminBookingReducer,
+    adminUsers: adminUserReducer,
   },
 });

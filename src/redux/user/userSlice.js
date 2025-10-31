@@ -70,7 +70,7 @@ const initialState = {
   loading: false,
   error: null,
   updateLoading: false,
-  updateError: null
+  updateError: null,
 };
 
 const userSlice = createSlice({

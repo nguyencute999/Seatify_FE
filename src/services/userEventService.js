@@ -2,8 +2,8 @@ import api from './apiService';
 
 const userEventService = {
   // Lấy tất cả sự kiện cho người dùng
-  getAllEvents: async () => {
-    const response = await api.get('/events');
+  getAllEvents: async (params = {}) => {
+    const response = await api.get('/events', { params });
     return response.data;
   },
 

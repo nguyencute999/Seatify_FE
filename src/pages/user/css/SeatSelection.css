@@ -105,22 +105,3 @@
   top: 2rem;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .seat-selection-page {
-    padding: 0.5rem;
-  }
-  
-  .seat-selection-page .d-flex {
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .sticky-top {
-    position: static;
-  }
-  
-  .selected-seats {
-    max-height: 200px;
-  }
-}

@@ -36,11 +36,10 @@ const getFinishedEvents = (events) => {
 // Async thunks for API calls
 export const fetchEvents = createAsyncThunk(
   'events/fetchEvents',
-  async (_, { rejectWithValue }) => {
+  async (params = {}, { rejectWithValue }) => {
     try {
-      const response = await userEventService.getAllEvents();
-      // API trả về { content: [...] } nên cần lấy content
-      return response.content || response;
+      const response = await userEventService.getAllEvents(params);
+      return response; // expect Spring Page
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch events');
     }
@@ -231,13 +230,25 @@ const eventSlice = createSlice({
       })
       .addCase(fetchEvents.fulfilled, (state, action) => {
         state.loading = false;
-        state.events = action.payload;
-        state.featuredEvents = getFeaturedEvents(action.payload);
-        state.upcomingEvents = getUpcomingEvents(action.payload);
-        state.ongoingEvents = getOngoingEvents(action.payload);
-        state.finishedEvents = getFinishedEvents(action.payload);
-        state.pagination.totalItems = action.payload.length;
-        state.pagination.totalPages = Math.ceil(action.payload.length / state.pagination.itemsPerPage);
+        const page = action.payload || {};
+        const content = page.content || [];
+        state.events = content;
+        state.featuredEvents = getFeaturedEvents(content);
+        state.upcomingEvents = getUpcomingEvents(content);
+        state.ongoingEvents = getOngoingEvents(content);
+        state.finishedEvents = getFinishedEvents(content);
+        // pagination from backend (0-based index)
+        if (page.totalPages !== undefined) {
+          state.pagination = {
+            currentPage: (page.number ?? 0) + 1,
+            totalPages: page.totalPages ?? 1,
+            totalItems: page.totalElements ?? content.length,
+            itemsPerPage: page.size ?? state.pagination.itemsPerPage
+          };
+        } else {
+          state.pagination.totalItems = content.length;
+          state.pagination.totalPages = Math.ceil(content.length / state.pagination.itemsPerPage);
+        }
       })
       .addCase(fetchEvents.rejected, (state, action) => {
         state.loading = false;

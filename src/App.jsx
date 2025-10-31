@@ -4,6 +4,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import ChatWidget from './components/ChatWidget';
 import GoToTopButton from './components/GoToTopButton';
 import AuthRedirectHandler from './components/AuthRedirectHandler';
 import './index.css';
@@ -18,6 +19,7 @@ function App() {
         </main>
         <Footer />
         <GoToTopButton />
+        <ChatWidget />
         <ToastContainer
           position="top-right"
           autoClose={5000}

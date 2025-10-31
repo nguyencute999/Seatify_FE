@@ -1,121 +1,27 @@
 import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchAdminBookings } from '../../redux/booking/adminBookingSlice';
 
 const ManageBookings = () => {
-  const [bookings, setBookings] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+  const { data: bookings, loading, error } = useSelector(state => state.adminBookings);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [eventFilter, setEventFilter] = useState('ALL');
   const [selectedBookings, setSelectedBookings] = useState([]);
 
-  // Mock data - sẽ thay thế bằng API calls thực tế
   useEffect(() => {
-    setTimeout(() => {
-      setBookings([
-        {
-          id: 1,
-          user: {
-            id: 1,
-            fullName: 'Nguyễn Văn A',
-            email: 'nguyenvana@fpt.edu.vn',
-            mssv: 'SE123456'
-          },
-          event: {
-            id: 1,
-            eventName: 'Seminar AI & Machine Learning',
-            startTime: '2024-01-20T09:00:00',
-            location: 'Hội trường A, Tòa nhà FPT'
-          },
-          seat: {
-            id: 1,
-            seatRow: 'A',
-            seatNumber: 1
-          },
-          bookingTime: '2024-01-15T10:30:00',
-          checkInTime: null,
-          checkOutTime: null,
-          status: 'BOOKED',
-          qrCode: 'QR123456789'
-        },
-        {
-          id: 2,
-          user: {
-            id: 2,
-            fullName: 'Trần Thị B',
-            email: 'tranthib@fpt.edu.vn',
-            mssv: 'SE123457'
-          },
-          event: {
-            id: 2,
-            eventName: 'Workshop React Development',
-            startTime: '2024-01-18T14:00:00',
-            location: 'Phòng Lab 301'
-          },
-          seat: {
-            id: 2,
-            seatRow: 'B',
-            seatNumber: 5
-          },
-          bookingTime: '2024-01-15T09:15:00',
-          checkInTime: '2024-01-18T13:45:00',
-          checkOutTime: null,
-          status: 'CHECKED_IN',
-          qrCode: 'QR123456790'
-        },
-        {
-          id: 3,
-          user: {
-            id: 3,
-            fullName: 'Lê Văn C',
-            email: 'levanc@fpt.edu.vn',
-            mssv: 'SE123458'
-          },
-          event: {
-            id: 3,
-            eventName: 'Conference Blockchain Technology',
-            startTime: '2024-01-16T08:00:00',
-            location: 'Trung tâm Hội nghị Quốc gia'
-          },
-          seat: {
-            id: 3,
-            seatRow: 'C',
-            seatNumber: 10
-          },
-          bookingTime: '2024-01-14T16:45:00',
-          checkInTime: '2024-01-16T07:30:00',
-          checkOutTime: '2024-01-16T16:30:00',
-          status: 'CHECKED_IN',
-          qrCode: 'QR123456791'
-        },
-        {
-          id: 4,
-          user: {
-            id: 4,
-            fullName: 'Phạm Thị D',
-            email: 'phamthid@fpt.edu.vn',
-            mssv: 'SE123459'
-          },
-          event: {
-            id: 1,
-            eventName: 'Seminar AI & Machine Learning',
-            startTime: '2024-01-20T09:00:00',
-            location: 'Hội trường A, Tòa nhà FPT'
-          },
-          seat: {
-            id: 4,
-            seatRow: 'A',
-            seatNumber: 15
-          },
-          bookingTime: '2024-01-16T11:20:00',
-          checkInTime: null,
-          checkOutTime: null,
-          status: 'CANCELLED',
-          qrCode: 'QR123456792'
-        }
-      ]);
-      setLoading(false);
-    }, 1000);
-  }, []);
+    const params = {
+      search: searchTerm,
+      status: statusFilter,
+      page: 0,
+      size: 20,
+    };
+    if (eventFilter !== 'ALL') {
+      params.eventId = eventFilter;
+    }
+    dispatch(fetchAdminBookings(params));
+  }, [dispatch, searchTerm, statusFilter, eventFilter]);
 
   const getStatusBadge = (status) => {
     const badges = {
@@ -140,6 +46,9 @@ const ManageBookings = () => {
   };
 
   const handleStatusChange = (bookingId, newStatus) => {
+    // This function is now a placeholder for future API calls
+    // For now, it will just update the local state, which won't persist
+    // unless the API is integrated.
     setBookings(prev => prev.map(booking => 
       booking.id === bookingId 
         ? { 
@@ -163,6 +72,9 @@ const ManageBookings = () => {
     }
 
     if (window.confirm(`Bạn có chắc chắn muốn thay đổi trạng thái của ${selectedBookings.length} đặt chỗ thành "${getStatusText(newStatus)}"?`)) {
+      // This function is now a placeholder for future API calls
+      // For now, it will just update the local state, which won't persist
+      // unless the API is integrated.
       setBookings(prev => prev.map(booking => 
         selectedBookings.includes(booking.id)
           ? { 
@@ -200,14 +112,14 @@ const ManageBookings = () => {
   const filteredBookings = bookings.filter(booking => {
     const matchesSearch = booking.user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          booking.user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         booking.user.mssv.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (booking.user.mssv && booking.user.mssv.toLowerCase().includes(searchTerm.toLowerCase())) ||
                          booking.event.eventName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'ALL' || booking.status === statusFilter;
-    const matchesEvent = eventFilter === 'ALL' || booking.event.id.toString() === eventFilter;
+    const matchesEvent = eventFilter === 'ALL' || booking.event.eventId.toString() === eventFilter;
     return matchesSearch && matchesStatus && matchesEvent;
   });
 
-  const uniqueEvents = [...new Set(bookings.map(booking => booking.event))];
+  const uniqueEvents = [...new Map(bookings.map(booking => [booking.event.eventId, booking.event])).values()];
 
   if (loading) {
     return (
@@ -216,6 +128,11 @@ const ManageBookings = () => {
           <span className="visually-hidden">Loading...</span>
         </div>
       </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className="alert alert-danger">Lỗi: {error}</div>
     );
   }
 
@@ -232,10 +149,6 @@ const ManageBookings = () => {
             <i className="bi bi-download me-2"></i>
             Xuất Excel
           </button>
-          {/* <button className="btn btn-outline-secondary">
-            <i className="bi bi-printer me-2"></i>
-            In danh sách
-          </button> */}
         </div>
       </div>
 
@@ -331,13 +244,13 @@ const ManageBookings = () => {
           >
             <option value="ALL">Tất cả sự kiện</option>
             {uniqueEvents.map(event => (
-              <option key={event.id} value={event.id}>
+              <option key={event.eventId} value={event.eventId}>
                 {event.eventName}
               </option>
             ))}
           </select>
         </div>
-        <div className="col-md-4">
+        {/* <div className="col-md-4">
           <div className="d-flex gap-2">
             <button 
               className="btn btn-success"
@@ -356,7 +269,7 @@ const ManageBookings = () => {
               Hủy hàng loạt
             </button>
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* Bookings Table */}
@@ -379,7 +292,6 @@ const ManageBookings = () => {
                   <th>Thời gian đặt</th>
                   <th>Check-in/out</th>
                   <th>Trạng thái</th>
-                  {/* <th>QR Code</th> */}
                   <th>Thao tác</th>
                 </tr>
               </thead>
@@ -435,14 +347,6 @@ const ManageBookings = () => {
                         {getStatusText(booking.status)}
                       </span>
                     </td>
-                    {/* <td>
-                      <button 
-                        className="btn btn-sm btn-outline-primary"
-                        title="Xem QR Code"
-                      >
-                        <i className="bi bi-qr-code"></i>
-                      </button>
-                    </td> */}
                     <td>
                       <div className="btn-group" role="group">
                         <button
@@ -497,7 +401,7 @@ const ManageBookings = () => {
       </div>
 
       {/* Selected Bookings Info */}
-      {selectedBookings.length > 0 && (
+      {/* {selectedBookings.length > 0 && (
         <div className="alert alert-info mt-3">
           <i className="bi bi-info-circle me-2"></i>
           Đã chọn {selectedBookings.length} đặt chỗ. 
@@ -508,7 +412,7 @@ const ManageBookings = () => {
             Bỏ chọn tất cả
           </button>
         </div>
-      )}
+      )} */}
     </div>
   );
 };

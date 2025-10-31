@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
+import HeroHoverCard from '../../components/ui/HeroHoverCard.jsx';
 import { Badge } from '../../components/ui/Badge';
 import EventCarousel from '../../components/EventCarousel';
 import { fetchEvents } from '../../redux/event/eventSlice';
@@ -24,13 +25,11 @@ const Home = ({ onViewChange = () => {} }) => {
   }, [dispatch]);
 
   const handleBookNow = (event) => {
-    // TODO: Implement booking logic
     console.log('Book now:', event);
     navigate('/events');
   };
 
   const handleViewDetails = (event) => {
-    // TODO: Navigate to event details
     console.log('View details:', event);
     navigate('/events');
   };
@@ -46,10 +45,11 @@ const Home = ({ onViewChange = () => {} }) => {
   return (
     <>
       {/* Hero Section */}
-      <div className="position-relative container-fluid px-4 py-5 py-md-5 orange-theme">
+      <div className="position-relative container-fluid px-0 py-5">
         <div className="row justify-content-center">
           <div className="col-12 col-lg-8">
-            <div className="hero-section">
+            <HeroHoverCard>
+              <div className="hero-section">
               <Badge 
                 variant="custom" 
                 className="mb-3 px-3 py-2 text-white border-0 hero-badge"
@@ -68,23 +68,13 @@ const Home = ({ onViewChange = () => {} }) => {
               
               <div className="d-flex flex-wrap gap-3">
                 {token ? (
-                  <>
-                    <Button 
-                      variant="light"
-                      className="btn-lg px-4 py-3 hero-btn-primary"
-                      onClick={() => navigate('/events')}
-                    >
-                      Xem sự kiện
-                      <i className="bi bi-arrow-right ms-2"></i>
-                    </Button>
-                    {/* <Button 
-                      variant="outline-light"
-                      className="btn-lg px-4 py-3 hero-btn-secondary"
-                      onClick={() => onViewChange('qr')}
-                    >
-                      QR Code của tôi
-                    </Button> */}
-                  </>
+                  <Button 
+                    variant="light"
+                    className="btn-lg px-4 py-3 hero-btn-primary"
+                    onClick={() => navigate('/events')}
+                  >
+                    Xem sự kiện <i className="bi bi-arrow-right ms-2"></i>
+                  </Button>
                 ) : (
                   <>
                     <Button 
@@ -92,8 +82,7 @@ const Home = ({ onViewChange = () => {} }) => {
                       className="btn-lg px-4 py-3 hero-btn-primary"
                       onClick={handleLogin}
                     >
-                      Đăng ký ngay
-                      <i className="bi bi-arrow-right ms-2"></i>
+                      Đăng ký ngay <i className="bi bi-arrow-right ms-2"></i>
                     </Button>
                     <Button 
                       variant="outline-light"
@@ -106,6 +95,7 @@ const Home = ({ onViewChange = () => {} }) => {
                 )}
               </div>
             </div>
+          </HeroHoverCard>
           </div>
         </div>
       </div>

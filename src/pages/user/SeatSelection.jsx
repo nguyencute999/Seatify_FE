@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchEventById } from '../../redux/event/eventSlice';
 import { createBooking, clearError, clearMessage } from '../../redux/booking/bookingSlice';
-import userSeatService from '../../services/userSeatService';
+import seatService from '../../services/seatService';
 import UserSeatLayout from '../../components/user/UserSeatLayout';
 import { Button } from '../../components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
@@ -60,10 +60,16 @@ const SeatSelection = () => {
     loadSeats();
   }, [eventId]);
 
+  useEffect(() => {
+    if (!token) {
+      navigate('/login');
+    }
+  }, [token, navigate]);
+
   const loadSeats = async () => {
     try {
       setLoadingSeats(true);
-      const response = await userSeatService.getSeatsByEventId(eventId);
+      const response = await seatService.getSeatsByEventId(eventId);
       console.log('Raw seats data from API:', response);
       
       const mappedSeats = response.map(seat => {

@@ -1,14 +1,17 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import EventList from '../../components/EventList';
 import { fetchEvents } from '../../redux/event/eventSlice';
 
 const Events = ({ onViewChange = () => {} }) => {
   const dispatch = useDispatch();
-  const { events, loading, error } = useSelector(state => state.events);
+  const { events, loading, error, pagination } = useSelector(state => state.events);
+  const lastParamsRef = useRef(null);
 
   useEffect(() => {
-    dispatch(fetchEvents());
+    const initial = { page: 0, size: 6, sortBy: 'startTime', desc: false };
+    lastParamsRef.current = initial;
+    dispatch(fetchEvents(initial));
   }, [dispatch]);
 
   const handleBookNow = (event) => {
@@ -52,6 +55,16 @@ const Events = ({ onViewChange = () => {} }) => {
         onBookNow={handleBookNow}
         onViewDetails={handleViewDetails}
         loading={loading}
+        pagination={pagination}
+        onFiltersChange={(params) => {
+          // avoid duplicate dispatches if params unchanged
+          const prev = lastParamsRef.current || {};
+          const changed = JSON.stringify(prev) !== JSON.stringify(params);
+          if (changed) {
+            lastParamsRef.current = params;
+            dispatch(fetchEvents(params));
+          }
+        }}
       />
     </div>
   );

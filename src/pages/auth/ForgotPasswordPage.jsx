@@ -11,6 +11,8 @@ import {
 import './AuthPages.css';
 
 const ForgotPasswordPage = () => {
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading, error, message } = useSelector(state => state.auth);
@@ -23,7 +25,6 @@ const ForgotPasswordPage = () => {
     confirmPassword: ''
   });
 
-  // Clear errors and messages when component mounts
   useEffect(() => {
     dispatch(clearError());
     dispatch(clearMessage());
@@ -33,7 +34,7 @@ const ForgotPasswordPage = () => {
   useEffect(() => {
     if (error) {
       toast.error(error);
-      dispatch(clearError());
+      // dispatch(clearError());
     }
     if (message) {
       toast.success(message);
@@ -112,6 +113,10 @@ const ForgotPasswordPage = () => {
                 />
               </div>
 
+              {error && (
+                <p className="text-danger mt-2" style={{ fontSize: '0.9rem' }}>{error}</p>
+              )}
+
               <button 
                 type="submit" 
                 className="btn btn-primary btn-forgot"
@@ -149,34 +154,68 @@ const ForgotPasswordPage = () => {
                 <label htmlFor="newPassword" className="form-label">
                   Mật khẩu mới
                 </label>
-                <input
-                  id="newPassword"
-                  name="newPassword"
-                  type="password"
-                  className="form-control"
-                  placeholder="Nhập mật khẩu mới"
-                  value={resetData.newPassword}
-                  onChange={handleInputChange}
-                  required
-                  minLength={6}
-                />
+                <div style={{ position: 'relative' }}>
+                  <input
+                    id="newPassword"
+                    name="newPassword"
+                    type={showNewPassword ? "text" : "password"}
+                    className="form-control"
+                    placeholder="Nhập mật khẩu mới"
+                    value={resetData.newPassword}
+                    onChange={handleInputChange}
+                    required
+                    minLength={6}
+                  />
+                  <span
+                    style={{
+                      position: 'absolute',
+                      right: '10px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      cursor: 'pointer',
+                      zIndex: 10
+                    }}
+                    onClick={() => setShowNewPassword((prev) => !prev)}
+                  >
+                    <i className={showNewPassword ? "bi bi-eye-slash" : "bi bi-eye"}></i>
+                  </span>
+                </div>
               </div>
 
               <div className="form-group">
                 <label htmlFor="confirmPassword" className="form-label">
                   Xác nhận mật khẩu mới
                 </label>
-                <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  className="form-control"
-                  placeholder="Nhập lại mật khẩu mới"
-                  value={resetData.confirmPassword}
-                  onChange={handleInputChange}
-                  required
-                />
+                <div style={{ position: 'relative' }}>
+                  <input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    className="form-control"
+                    placeholder="Nhập lại mật khẩu mới"
+                    value={resetData.confirmPassword}
+                    onChange={handleInputChange}
+                    required
+                  />
+                  <span
+                    style={{
+                      position: 'absolute',
+                      right: '10px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      cursor: 'pointer',
+                      zIndex: 10
+                    }}
+                    onClick={() => setShowConfirmPassword((prev) => !prev)}
+                  >
+                    <i className={showConfirmPassword ? "bi bi-eye-slash" : "bi bi-eye"}></i>
+                  </span>
+                </div>
               </div>
+
+              {error && (
+                <p className="text-danger mt-2" style={{ fontSize: '0.9rem' }}>{error}</p>
+              )}
 
               <button 
                 type="submit" 

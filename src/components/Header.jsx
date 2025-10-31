@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../redux/auth/authSlice';
 import './css/Header.css';
+import AnimatedLoginButton from './ui/AnimatedLoginButton.jsx';
 import logo from '../images/logo.jpg';
 import userService from '../services/userService';
 
@@ -200,12 +201,7 @@ const Header = () => {
               )}
             </div>
           ) : (
-            <button 
-              className="login-btn"
-              onClick={handleLoginClick}
-            >
-              Đăng nhập
-            </button>
+            <AnimatedLoginButton onClick={handleLoginClick} />
           )}
         </div>
       </div>

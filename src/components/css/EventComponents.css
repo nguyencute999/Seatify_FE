@@ -186,11 +186,11 @@
 
 .events-filter {
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  border-radius: 16px;
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 123, 255, 0.1);
+  border-radius: 12px;
+  padding: 0.75rem; /* compact */
+  margin-bottom: 1rem; /* compact */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 123, 255, 0.08);
 }
 
 .events-search {
@@ -207,9 +207,11 @@
 
 .events-search input {
   padding-left: 2.5rem;
-  border-radius: 12px;
+  border-radius: 10px;
   border: 2px solid #e3f2fd;
   transition: all 0.3s ease;
+  height: 40px; /* compact */
+  font-size: 0.9rem;
 }
 
 .events-search input:focus {
@@ -220,39 +222,39 @@
 /* Time Filter Styles */
 .time-filter-container {
   background: white;
-  border-radius: 12px;
-  padding: 1rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+  padding: 0.5rem; /* compact */
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
 }
 
 .time-filter-label {
   color: #495057;
-  font-size: 0.95rem;
+  font-size: 0.9rem; /* compact */
   display: flex;
   align-items: center;
 }
 
 .time-filter-buttons {
   display: flex;
-  gap: 0.75rem;
+  gap: 0.5rem; /* compact */
   flex-wrap: wrap;
 }
 
 .time-filter-btn {
   display: flex;
   align-items: center;
-  padding: 0.75rem 1.25rem;
+  padding: 0.5rem 0.9rem; /* compact */
   border: 2px solid #e3f2fd;
   background: white;
   color: #1976d2;
-  border-radius: 12px;
+  border-radius: 10px;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.85rem; /* compact */
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-  min-width: 140px;
+  min-width: 110px; /* compact */
   justify-content: center;
 }
 
@@ -294,7 +296,14 @@
 }
 
 .time-filter-btn i {
-  font-size: 1rem;
+  font-size: 0.95rem; /* compact */
+}
+
+/* Responsive tweaks for smaller heights */
+@media (max-width: 768px) {
+  .events-filter { padding: 0.5rem; }
+  .events-search input { height: 38px; }
+  .time-filter-btn { min-width: 100px; padding: 0.45rem 0.8rem; }
 }
 
 /* Modern Pagination Styles */
