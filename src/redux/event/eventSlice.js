@@ -46,6 +46,19 @@ export const fetchEvents = createAsyncThunk(
   }
 );
 
+// Fetch featured events from API
+export const fetchFeaturedEvents = createAsyncThunk(
+  'events/fetchFeaturedEvents',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await userEventService.getFeaturedEvents();
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch featured events');
+    }
+  }
+);
+
 // Admin Events API calls
 export const fetchAdminEvents = createAsyncThunk(
   'events/fetchAdminEvents',
@@ -233,7 +246,11 @@ const eventSlice = createSlice({
         const page = action.payload || {};
         const content = page.content || [];
         state.events = content;
-        state.featuredEvents = getFeaturedEvents(content);
+        // Don't filter featuredEvents here - use fetchFeaturedEvents API instead
+        // Only filter if featuredEvents is empty (fallback)
+        if (state.featuredEvents.length === 0) {
+          state.featuredEvents = getFeaturedEvents(content);
+        }
         state.upcomingEvents = getUpcomingEvents(content);
         state.ongoingEvents = getOngoingEvents(content);
         state.finishedEvents = getFinishedEvents(content);
@@ -253,6 +270,26 @@ const eventSlice = createSlice({
       .addCase(fetchEvents.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      
+      // Fetch Featured Events
+      .addCase(fetchFeaturedEvents.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchFeaturedEvents.fulfilled, (state, action) => {
+        state.loading = false;
+        // Handle both array response and paginated response
+        const featuredData = Array.isArray(action.payload) 
+          ? action.payload 
+          : (action.payload.content || []);
+        state.featuredEvents = featuredData;
+      })
+      .addCase(fetchFeaturedEvents.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        // Fallback to filtering from all events if API fails
+        state.featuredEvents = getFeaturedEvents(state.events);
       })
       
       // Fetch Event by ID

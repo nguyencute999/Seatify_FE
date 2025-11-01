@@ -11,6 +11,12 @@ const userEventService = {
   getEventById: async (eventId) => {
     const response = await api.get(`/events/${eventId}`);
     return response.data;
+  },
+
+  // Lấy các sự kiện nổi bật
+  getFeaturedEvents: async () => {
+    const response = await api.get('/events/featured');
+    return response.data;
   }
 };
 

@@ -5,6 +5,7 @@ import { Card, CardContent } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { fetchEventById } from '../../redux/event/eventSlice';
+import EventCommentSection from '../../components/EventCommentSection';
 import '../css/EventDetail.css';
 
 const EventDetail = () => {
@@ -230,6 +231,9 @@ const EventDetail = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Comments Section */}
+            <EventCommentSection eventId={eventId} />
           </div>
 
           <div className="col-lg-4">
@@ -269,7 +273,7 @@ const EventDetail = () => {
                       onClick={handleBookNow}
                     >
                       <i className="bi bi-ticket-perforated me-2"></i>
-                      Đặt chỗ ngay
+                      Đặt chỗ
                     </Button>
                   ) : currentEvent.status === 'ONGOING' ? (
                     <Button 

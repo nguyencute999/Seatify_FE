@@ -1,7 +1,33 @@
 import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  fetchOverviewStats,
+  fetchEventStats,
+  fetchUserStats,
+  fetchBookingTrends,
+  fetchAttendanceData,
+  fetchRevenueStats,
+  clearError,
+} from '../../redux/admin/adminReportSlice';
 
 const Reports = () => {
-  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+  const {
+    overviewStats,
+    eventStats,
+    userStats,
+    bookingTrends,
+    attendanceData,
+    revenueStats,
+    overviewStatsLoading,
+    eventStatsLoading,
+    userStatsLoading,
+    bookingTrendsLoading,
+    attendanceDataLoading,
+    revenueStatsLoading,
+    error,
+  } = useSelector((state) => state.adminReport);
+
   const [dateRange, setDateRange] = useState({
     startDate: new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().split('T')[0],
     endDate: new Date().toISOString().split('T')[0]
@@ -9,116 +35,93 @@ const Reports = () => {
   const [selectedEvent, setSelectedEvent] = useState('ALL');
   const [reportType, setReportType] = useState('OVERVIEW');
 
-  const [overviewStats, setOverviewStats] = useState({
-    totalEvents: 0,
-    totalBookings: 0,
-    totalUsers: 0,
-    totalRevenue: 0,
-    averageAttendance: 0,
-    topEvent: null
-  });
+  // Convert selectedEvent to number or null
+  const eventId = selectedEvent === 'ALL' ? null : Number(selectedEvent);
 
-  const [eventStats, setEventStats] = useState([]);
-  const [userStats, setUserStats] = useState([]);
-  const [bookingTrends, setBookingTrends] = useState([]);
-  const [attendanceData, setAttendanceData] = useState([]);
-
-  // Mock data - sẽ thay thế bằng API calls thực tế
+  // Fetch data based on report type and filters
   useEffect(() => {
-    setTimeout(() => {
-      setOverviewStats({
-        totalEvents: 45,
-        totalBookings: 3200,
-        totalUsers: 1250,
-        totalRevenue: 125000000,
-        averageAttendance: 85.5,
-        topEvent: 'Seminar AI & Machine Learning'
-      });
+    if (!dateRange.startDate || !dateRange.endDate) return;
 
-      setEventStats([
-        {
-          id: 1,
-          eventName: 'Seminar AI & Machine Learning',
-          totalBookings: 850,
-          attendance: 780,
-          revenue: 25000000,
-          status: 'FINISHED'
-        },
-        {
-          id: 2,
-          eventName: 'Workshop React Development',
-          totalBookings: 500,
-          attendance: 480,
-          revenue: 15000000,
-          status: 'FINISHED'
-        },
-        {
-          id: 3,
-          eventName: 'Conference Blockchain Technology',
-          totalBookings: 1200,
-          attendance: 1100,
-          revenue: 40000000,
-          status: 'FINISHED'
-        },
-        {
-          id: 4,
-          eventName: 'Tech Talk: Cloud Computing',
-          totalBookings: 800,
-          attendance: 720,
-          revenue: 20000000,
-          status: 'FINISHED'
-        }
-      ]);
+    const fetchData = () => {
+      switch (reportType) {
+        case 'OVERVIEW':
+          dispatch(fetchOverviewStats({
+            startDate: dateRange.startDate,
+            endDate: dateRange.endDate,
+            eventId,
+          }));
+          // Also fetch booking trends and attendance for overview charts
+          dispatch(fetchBookingTrends({
+            startDate: dateRange.startDate,
+            endDate: dateRange.endDate,
+          }));
+          dispatch(fetchAttendanceData({
+            startDate: dateRange.startDate,
+            endDate: dateRange.endDate,
+            eventId,
+          }));
+          break;
+        case 'EVENTS':
+          dispatch(fetchEventStats({
+            startDate: dateRange.startDate,
+            endDate: dateRange.endDate,
+            eventId,
+          }));
+          break;
+        case 'USERS':
+          dispatch(fetchUserStats({
+            startDate: dateRange.startDate,
+            endDate: dateRange.endDate,
+          }));
+          break;
+        case 'BOOKINGS':
+          dispatch(fetchBookingTrends({
+            startDate: dateRange.startDate,
+            endDate: dateRange.endDate,
+          }));
+          dispatch(fetchAttendanceData({
+            startDate: dateRange.startDate,
+            endDate: dateRange.endDate,
+            eventId,
+          }));
+          break;
+        case 'REVENUE':
+          dispatch(fetchRevenueStats({
+            startDate: dateRange.startDate,
+            endDate: dateRange.endDate,
+            eventId,
+          }));
+          break;
+        default:
+          break;
+      }
+    };
 
-      setUserStats([
-        {
-          month: '2024-01',
-          newUsers: 150,
-          activeUsers: 1200,
-          totalBookings: 850
-        },
-        {
-          month: '2023-12',
-          newUsers: 120,
-          activeUsers: 1100,
-          totalBookings: 720
-        },
-        {
-          month: '2023-11',
-          newUsers: 180,
-          activeUsers: 1050,
-          totalBookings: 680
-        },
-        {
-          month: '2023-10',
-          newUsers: 200,
-          activeUsers: 980,
-          totalBookings: 650
-        }
-      ]);
+    fetchData();
+  }, [dateRange, selectedEvent, reportType, dispatch]);
 
-      setBookingTrends([
-        { date: '2024-01-01', bookings: 45 },
-        { date: '2024-01-02', bookings: 52 },
-        { date: '2024-01-03', bookings: 38 },
-        { date: '2024-01-04', bookings: 67 },
-        { date: '2024-01-05', bookings: 73 },
-        { date: '2024-01-06', bookings: 89 },
-        { date: '2024-01-07', bookings: 95 }
-      ]);
+  // Get loading state based on report type
+  const getLoadingState = () => {
+    switch (reportType) {
+      case 'OVERVIEW':
+        return overviewStatsLoading || bookingTrendsLoading || attendanceDataLoading;
+      case 'EVENTS':
+        return eventStatsLoading;
+      case 'USERS':
+        return userStatsLoading;
+      case 'BOOKINGS':
+        return bookingTrendsLoading || attendanceDataLoading;
+      case 'REVENUE':
+        return revenueStatsLoading;
+      default:
+        return false;
+    }
+  };
 
-      setAttendanceData([
-        { eventName: 'Seminar AI', attendance: 91.8 },
-        { eventName: 'React Workshop', attendance: 96.0 },
-        { eventName: 'Blockchain Conf', attendance: 91.7 },
-        { eventName: 'Cloud Tech Talk', attendance: 90.0 }
-      ]);
-
-      setLoading(false);
-    }, 1000);
-  }, [dateRange, selectedEvent]);
+  const loading = getLoadingState();
 
   const formatCurrency = (amount) => {
+    if (!amount && amount !== 0) return '0 ₫';
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
       currency: 'VND'
@@ -126,17 +129,31 @@ const Reports = () => {
   };
 
   const formatDate = (dateString) => {
+    if (!dateString) return '';
     return new Date(dateString).toLocaleDateString('vi-VN');
   };
 
   const calculateAttendanceRate = (attendance, totalBookings) => {
-    return totalBookings > 0 ? ((attendance / totalBookings) * 100).toFixed(1) : 0;
+    if (!totalBookings || totalBookings === 0) return 0;
+    return ((attendance / totalBookings) * 100).toFixed(1);
   };
 
   const generateReport = () => {
     // Logic để generate report dựa trên filters
     console.log('Generating report with:', { dateRange, selectedEvent, reportType });
   };
+
+  // Get default overview stats to avoid null reference errors
+  const defaultOverviewStats = {
+    totalEvents: 0,
+    totalBookings: 0,
+    totalUsers: 0,
+    totalRevenue: 0,
+    averageAttendance: 0,
+    topEvent: null
+  };
+
+  const displayOverviewStats = overviewStats || defaultOverviewStats;
 
   if (loading) {
     return (
@@ -161,10 +178,6 @@ const Reports = () => {
             <i className="bi bi-download me-2"></i>
             Xuất báo cáo
           </button>
-          {/* <button className="btn btn-primary">
-            <i className="bi bi-printer me-2"></i>
-            In báo cáo
-          </button> */}
         </div>
       </div>
 
@@ -221,6 +234,20 @@ const Reports = () => {
         </div>
       </div>
 
+      {/* Error Message */}
+      {error && (
+        <div className="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>Lỗi:</strong> {error}
+          <button
+            type="button"
+            className="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+            onClick={() => dispatch(clearError())}
+          ></button>
+        </div>
+      )}
+
       {/* Overview Stats */}
       {reportType === 'OVERVIEW' && (
         <>
@@ -228,7 +255,7 @@ const Reports = () => {
             <div className="col-md-2">
               <div className="card bg-primary text-white">
                 <div className="card-body text-center">
-                  <h3>{overviewStats.totalEvents}</h3>
+                  <h3>{displayOverviewStats.totalEvents || 0}</h3>
                   <p className="mb-0">Sự kiện</p>
                 </div>
               </div>
@@ -236,7 +263,7 @@ const Reports = () => {
             <div className="col-md-2">
               <div className="card bg-success text-white">
                 <div className="card-body text-center">
-                  <h3>{overviewStats.totalBookings.toLocaleString()}</h3>
+                  <h3>{(displayOverviewStats.totalBookings || 0).toLocaleString()}</h3>
                   <p className="mb-0">Đặt chỗ</p>
                 </div>
               </div>
@@ -244,7 +271,7 @@ const Reports = () => {
             <div className="col-md-2">
               <div className="card bg-info text-white">
                 <div className="card-body text-center">
-                  <h3>{overviewStats.totalUsers.toLocaleString()}</h3>
+                  <h3>{(displayOverviewStats.totalUsers || 0).toLocaleString()}</h3>
                   <p className="mb-0">Người dùng</p>
                 </div>
               </div>
@@ -252,7 +279,7 @@ const Reports = () => {
             <div className="col-md-2">
               <div className="card bg-warning text-white">
                 <div className="card-body text-center">
-                  <h3>{formatCurrency(overviewStats.totalRevenue)}</h3>
+                  <h3>{formatCurrency(displayOverviewStats.totalRevenue)}</h3>
                   <p className="mb-0">Doanh thu</p>
                 </div>
               </div>
@@ -260,7 +287,7 @@ const Reports = () => {
             <div className="col-md-2">
               <div className="card bg-secondary text-white">
                 <div className="card-body text-center">
-                  <h3>{overviewStats.averageAttendance}%</h3>
+                  <h3>{displayOverviewStats.averageAttendance || 0}%</h3>
                   <p className="mb-0">Tỷ lệ tham gia</p>
                 </div>
               </div>
@@ -269,7 +296,7 @@ const Reports = () => {
               <div className="card bg-dark text-white">
                 <div className="card-body text-center">
                   <h6 className="mb-0">Sự kiện hot</h6>
-                  <small>{overviewStats.topEvent}</small>
+                  <small>{displayOverviewStats.topEvent || 'N/A'}</small>
                 </div>
               </div>
             </div>
@@ -329,11 +356,18 @@ const Reports = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {eventStats.map(event => (
-                    <tr key={event.id}>
-                      <td className="fw-bold">{event.eventName}</td>
-                      <td>{event.totalBookings.toLocaleString()}</td>
-                      <td>{event.attendance.toLocaleString()}</td>
+                  {eventStats.length === 0 && !eventStatsLoading && (
+                    <tr>
+                      <td colSpan="6" className="text-center text-muted">
+                        Không có dữ liệu
+                      </td>
+                    </tr>
+                  )}
+                  {eventStats.map((event, index) => (
+                    <tr key={event.id || event.eventId || index}>
+                      <td className="fw-bold">{event.eventName || 'N/A'}</td>
+                      <td>{(event.totalBookings || 0).toLocaleString()}</td>
+                      <td>{(event.attendance || 0).toLocaleString()}</td>
                       <td>
                         <div className="d-flex align-items-center">
                           <div className="progress me-2" style={{ width: '100px', height: '20px' }}>
@@ -349,7 +383,9 @@ const Reports = () => {
                       </td>
                       <td>{formatCurrency(event.revenue)}</td>
                       <td>
-                        <span className="badge bg-success">Hoàn thành</span>
+                        <span className={`badge ${event.status === 'FINISHED' ? 'bg-success' : 'bg-warning'}`}>
+                          {event.status === 'FINISHED' ? 'Hoàn thành' : event.status || 'N/A'}
+                        </span>
                       </td>
                     </tr>
                   ))}
@@ -379,19 +415,27 @@ const Reports = () => {
                   </tr>
                 </thead>
                 <tbody>
+                  {userStats.length === 0 && !userStatsLoading && (
+                    <tr>
+                      <td colSpan="5" className="text-center text-muted">
+                        Không có dữ liệu
+                      </td>
+                    </tr>
+                  )}
                   {userStats.map((stat, index) => (
-                    <tr key={stat.month}>
-                      <td className="fw-bold">{stat.month}</td>
-                      <td>{stat.newUsers.toLocaleString()}</td>
-                      <td>{stat.activeUsers.toLocaleString()}</td>
-                      <td>{stat.totalBookings.toLocaleString()}</td>
+                    <tr key={stat.month || index}>
+                      <td className="fw-bold">{stat.month || 'N/A'}</td>
+                      <td>{(stat.newUsers || 0).toLocaleString()}</td>
+                      <td>{(stat.activeUsers || 0).toLocaleString()}</td>
+                      <td>{(stat.totalBookings || 0).toLocaleString()}</td>
                       <td>
-                        {index > 0 && (
+                        {index > 0 && userStats[index - 1]?.newUsers > 0 && (
                           <span className={`badge ${stat.newUsers > userStats[index - 1].newUsers ? 'bg-success' : 'bg-danger'}`}>
                             {stat.newUsers > userStats[index - 1].newUsers ? '+' : ''}
                             {((stat.newUsers - userStats[index - 1].newUsers) / userStats[index - 1].newUsers * 100).toFixed(1)}%
                           </span>
                         )}
+                        {index === 0 && <span className="text-muted">-</span>}
                       </td>
                     </tr>
                   ))}
@@ -421,23 +465,33 @@ const Reports = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {bookingTrends.map(trend => (
-                        <tr key={trend.date}>
-                          <td>{formatDate(trend.date)}</td>
-                          <td>{trend.bookings}</td>
-                          <td>
-                            <div className="progress" style={{ height: '20px' }}>
-                              <div 
-                                className="progress-bar" 
-                                role="progressbar" 
-                                style={{ width: `${(trend.bookings / 100) * 100}%` }}
-                              >
-                                {trend.bookings}
-                              </div>
-                            </div>
+                      {bookingTrends.length === 0 && !bookingTrendsLoading && (
+                        <tr>
+                          <td colSpan="3" className="text-center text-muted">
+                            Không có dữ liệu
                           </td>
                         </tr>
-                      ))}
+                      )}
+                      {bookingTrends.map((trend, index) => {
+                        const maxBookings = Math.max(...bookingTrends.map(t => t.bookings || 0), 1);
+                        return (
+                          <tr key={trend.date || index}>
+                            <td>{formatDate(trend.date)}</td>
+                            <td>{trend.bookings || 0}</td>
+                            <td>
+                              <div className="progress" style={{ height: '20px' }}>
+                                <div 
+                                  className="progress-bar" 
+                                  role="progressbar" 
+                                  style={{ width: `${((trend.bookings || 0) / maxBookings) * 100}%` }}
+                                >
+                                  {trend.bookings || 0}
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -460,18 +514,25 @@ const Reports = () => {
                       </tr>
                     </thead>
                     <tbody>
+                      {attendanceData.length === 0 && !attendanceDataLoading && (
+                        <tr>
+                          <td colSpan="3" className="text-center text-muted">
+                            Không có dữ liệu
+                          </td>
+                        </tr>
+                      )}
                       {attendanceData.map((data, index) => (
                         <tr key={index}>
-                          <td>{data.eventName}</td>
-                          <td>{data.attendance}%</td>
+                          <td>{data.eventName || 'N/A'}</td>
+                          <td>{data.attendance || data.attendanceRate || 0}%</td>
                           <td>
                             <div className="progress" style={{ height: '20px' }}>
                               <div 
                                 className="progress-bar" 
                                 role="progressbar" 
-                                style={{ width: `${data.attendance}%` }}
+                                style={{ width: `${data.attendance || data.attendanceRate || 0}%` }}
                               >
-                                {data.attendance}%
+                                {data.attendance || data.attendanceRate || 0}%
                               </div>
                             </div>
                           </td>
@@ -505,23 +566,33 @@ const Reports = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {eventStats.map(event => (
-                        <tr key={event.id}>
-                          <td>{event.eventName}</td>
-                          <td className="fw-bold">{formatCurrency(event.revenue)}</td>
-                          <td>
-                            <div className="progress" style={{ height: '20px' }}>
-                              <div 
-                                className="progress-bar" 
-                                role="progressbar" 
-                                style={{ width: `${(event.revenue / 40000000) * 100}%` }}
-                              >
-                                {((event.revenue / 40000000) * 100).toFixed(1)}%
-                              </div>
-                            </div>
+                      {revenueStats.length === 0 && !revenueStatsLoading && (
+                        <tr>
+                          <td colSpan="3" className="text-center text-muted">
+                            Không có dữ liệu
                           </td>
                         </tr>
-                      ))}
+                      )}
+                      {revenueStats.map((stat, index) => {
+                        const maxRevenue = Math.max(...revenueStats.map(s => s.revenue || 0), 1);
+                        return (
+                          <tr key={stat.eventId || stat.id || index}>
+                            <td>{stat.eventName || 'N/A'}</td>
+                            <td className="fw-bold">{formatCurrency(stat.revenue)}</td>
+                            <td>
+                              <div className="progress" style={{ height: '20px' }}>
+                                <div 
+                                  className="progress-bar" 
+                                  role="progressbar" 
+                                  style={{ width: `${((stat.revenue || 0) / maxRevenue) * 100}%` }}
+                                >
+                                  {(((stat.revenue || 0) / maxRevenue) * 100).toFixed(1)}%
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -534,20 +605,28 @@ const Reports = () => {
                 <h5>Tổng kết doanh thu</h5>
               </div>
               <div className="card-body text-center">
-                <h2 className="text-primary">{formatCurrency(overviewStats.totalRevenue)}</h2>
+                <h2 className="text-primary">{formatCurrency(displayOverviewStats.totalRevenue)}</h2>
                 <p className="text-muted">Tổng doanh thu trong khoảng thời gian đã chọn</p>
-                <div className="row mt-4">
-                  <div className="col-6">
-                    <div className="border-end">
-                      <h4 className="text-success">{formatCurrency(25000000)}</h4>
-                      <small className="text-muted">Cao nhất</small>
+                {revenueStats.length > 0 && (
+                  <div className="row mt-4">
+                    <div className="col-6">
+                      <div className="border-end">
+                        <h4 className="text-success">
+                          {formatCurrency(Math.max(...revenueStats.map(s => s.revenue || 0)))}
+                        </h4>
+                        <small className="text-muted">Cao nhất</small>
+                      </div>
+                    </div>
+                    <div className="col-6">
+                      <h4 className="text-info">
+                        {formatCurrency(
+                          revenueStats.reduce((sum, s) => sum + (s.revenue || 0), 0) / revenueStats.length
+                        )}
+                      </h4>
+                      <small className="text-muted">Trung bình</small>
                     </div>
                   </div>
-                  <div className="col-6">
-                    <h4 className="text-info">{formatCurrency(15000000)}</h4>
-                    <small className="text-muted">Trung bình</small>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
           </div>

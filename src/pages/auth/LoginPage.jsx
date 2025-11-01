@@ -19,6 +19,7 @@ const LoginPage = () => {
     email: '',
     password: ''
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   // Show toast notifications for errors and messages
   useEffect(() => {
@@ -99,16 +100,33 @@ const LoginPage = () => {
               <label htmlFor="password" className="form-label">
                 Mật khẩu
               </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                className="form-control"
-                placeholder="Nhập mật khẩu"
-                value={formData.password}
-                onChange={handleInputChange}
-                required
-              />
+              <div style={{ position: 'relative' }}>
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  className="form-control"
+                  placeholder="Nhập mật khẩu"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  required
+                />
+                <span
+                  style={{
+                    position: 'absolute',
+                    right: '10px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    cursor: 'pointer',
+                    zIndex: 10
+                  }}
+                  onClick={() => setShowPassword(prev => !prev)}
+                  aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                  title={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                >
+                  <i className={showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'}></i>
+                </span>
+              </div>
               {error && (
                 <div className="text-danger mt-2 small">{error}</div>
               )}

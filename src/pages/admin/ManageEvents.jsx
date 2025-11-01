@@ -339,10 +339,6 @@ const ManageEvents = () => {
               <i className="bi bi-download me-1"></i>
               Xuất Excel
             </button>
-            {/* <button className="btn btn-outline-secondary">
-              <i className="bi bi-printer me-1"></i>
-              In danh sách
-            </button> */}
           </div>
         </div>
       </div>

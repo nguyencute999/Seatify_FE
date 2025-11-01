@@ -1,11 +1,14 @@
 import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import EventList from '../../components/EventList';
 import { fetchEvents } from '../../redux/event/eventSlice';
 
 const Events = ({ onViewChange = () => {} }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { events, loading, error, pagination } = useSelector(state => state.events);
+  const { token } = useSelector(state => state.auth);
   const lastParamsRef = useRef(null);
 
   useEffect(() => {
@@ -15,15 +18,21 @@ const Events = ({ onViewChange = () => {} }) => {
   }, [dispatch]);
 
   const handleBookNow = (event) => {
-    // TODO: Implement booking logic
-    console.log('Book now:', event);
-    // Navigate to booking page or show booking modal
+    const id = event?.eventId || event?.event_id || event?.id;
+    if (!id) {
+      navigate('/events');
+      return;
+    }
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+    navigate(`/events/${id}/seats`);
   };
 
   const handleViewDetails = (event) => {
-    // TODO: Navigate to event details page
-    console.log('View details:', event);
-    // Navigate to event detail page
+    const id = event?.eventId || event?.event_id || event?.id;
+    navigate(id ? `/events/${id}` : '/events');
   };
 
   if (error) {

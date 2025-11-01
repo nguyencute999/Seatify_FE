@@ -1,0 +1,110 @@
+/* Base */
+.booking-history-page { padding: 24px 0; }
+.booking-history-page h2 { font-size: 22px; margin: 0; }
+
+/* Responsive Grid */
+.booking-history-page .cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 991.98px) {
+  .booking-history-page .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 575.98px) {
+  .booking-history-page { padding-top: 12px; }
+  .booking-history-page h2 { font-size: 18px; }
+  .booking-history-page .cards-grid { grid-template-columns: 1fr; gap: 12px; }
+}
+
+/* Card look & feel */
+.booking-history-page .card {
+  border: 1px solid #e9eef5;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(20, 40, 120, 0.06);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  background: #ffffff;
+}
+
+.booking-history-page .card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(20, 40, 120, 0.12);
+  border-color: #d7e2f3;
+}
+
+.booking-history-page .booking-details p { margin-bottom: 6px; color: #2c3e50; }
+.booking-history-page .booking-details p strong { color: #1d2939; }
+
+/* Status badges */
+.status-badge {
+  --_bg: #e9ecef;
+  --_fg: #1d2939;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 12px;
+  background: var(--_bg);
+  color: var(--_fg);
+  border: 1px solid rgba(0,0,0,0.06);
+}
+.status-booked   { --_bg: #e6f6ea; --_fg: #0f9d58; }
+.status-cancelled{ --_bg: #fde7e9; --_fg: #d93025; }
+.status-pending  { --_bg: #fff3e0; --_fg: #e67e22; }
+.status-completed{ --_bg: #e3faf7; --_fg: #0aa69e; }
+.status-checked_in { --_bg: #e6f0ff; --_fg: #1a73e8; }
+.status-checked_out{ --_bg: #f2f4f7; --_fg: #667085; }
+
+/* QR image container */
+.booking-history-page .qr-wrapper {
+  margin-top: 10px;
+  padding: 10px;
+  background: #ffffff;
+  border: 1px solid #eef2f7;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.booking-history-page .qr-wrapper img {
+  width: 100%;
+  height: auto;
+  max-width: 200px;
+  border-radius: 8px;
+}
+
+/* Empty state */
+.booking-history-page .empty-state { padding: 48px 16px; }
+.booking-history-page .empty-state .bi { font-size: 3rem; color: #98a2b3; }
+.booking-history-page .empty-state h4 { margin-top: 12px; color: #1d2939; }
+.booking-history-page .empty-state p { color: #667085; }
+
+.booking-history-page .cta-gradient {
+  background: linear-gradient(135deg, #5b8def 0%, #7f9cf5 40%, #8ecae6 100%);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 16px;
+  box-shadow: 0 6px 16px rgba(93, 122, 255, 0.25);
+  transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+}
+.booking-history-page .cta-gradient:hover { 
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(93, 122, 255, 0.35);
+  filter: brightness(1.03);
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .booking-history-page .card { background: #0f172a; border-color: #1e293b; box-shadow: 0 2px 8px rgba(0,0,0,0.4); }
+  .booking-history-page .card:hover { border-color: #2a3a53; box-shadow: 0 10px 24px rgba(0,0,0,0.5); }
+  .booking-history-page .booking-details p { color: #e2e8f0; }
+  .booking-history-page .booking-details p strong { color: #f8fafc; }
+  .booking-history-page .qr-wrapper { background: #0b1220; border-color: #1e293b; }
+  .booking-history-page .empty-state .bi { color: #94a3b8; }
+  .booking-history-page .empty-state h4 { color: #e2e8f0; }
+  .booking-history-page .empty-state p { color: #94a3b8; }
+}
+
+

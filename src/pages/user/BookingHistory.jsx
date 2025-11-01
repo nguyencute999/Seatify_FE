@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getUserBookings, clearError, clearMessage } from '../../redux/booking/bookingSlice';
+import { getUserBookingHistory, clearError, clearMessage } from '../../redux/booking/bookingSlice';
+import '../css/BookingHistory.css';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
@@ -10,7 +11,7 @@ const BookingHistory = () => {
   const { bookings, loading, error, message } = useSelector(state => state.booking);
 
   useEffect(() => {
-    dispatch(getUserBookings());
+    dispatch(getUserBookingHistory());
   }, [dispatch]);
 
   useEffect(() => {
@@ -28,14 +29,9 @@ const BookingHistory = () => {
   }, [error, dispatch]);
 
   const getStatusBadge = (status) => {
-    const variants = {
-      'CONFIRMED': 'success',
-      'CANCELLED': 'danger',
-      'PENDING': 'warning',
-      'COMPLETED': 'primary'
-    };
+    const key = (status || '').toLowerCase();
     return (
-      <Badge variant={variants[status] || 'secondary'}>
+      <Badge variant="custom" className={`status-badge status-${key}`}>
         {status}
       </Badge>
     );
@@ -64,13 +60,13 @@ const BookingHistory = () => {
   return (
     <div className="booking-history-page">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2>Lịch sử đặt chỗ</h2>
+        <h2>Lịch sử đặt sự kiện</h2>
       </div>
 
       {bookings && bookings.length > 0 ? (
-        <div className="row">
+        <div className="cards-grid">
           {bookings.map((booking) => (
-            <div key={booking.bookingId} className="col-md-6 col-lg-4 mb-4">
+            <div key={booking.bookingId} className="grid-item">
               <Card>
                 <CardHeader>
                   <CardTitle className="d-flex justify-content-between align-items-center">
@@ -81,46 +77,21 @@ const BookingHistory = () => {
                 <CardContent>
                   <div className="booking-details">
                     <p><strong>Sự kiện:</strong> {booking.eventName}</p>
-                    <p><strong>Địa điểm:</strong> {booking.location}</p>
-                    <p><strong>Ghế:</strong> {booking.seatNumbers?.join(', ') || 'N/A'}</p>
-                    <p><strong>Số lượng:</strong> {booking.seatCount}</p>
-                    <p><strong>Tổng tiền:</strong> 
-                      {booking.totalPrice > 0 
-                        ? `${booking.totalPrice.toLocaleString('vi-VN')}đ` 
-                        : 'Miễn phí'
-                      }
-                    </p>
-                    <p><strong>Ngày đặt:</strong> {formatDate(booking.createdAt)}</p>
-                    {booking.eventDate && (
-                      <p><strong>Ngày sự kiện:</strong> {formatDate(booking.eventDate)}</p>
+                    <p><strong>Ghế:</strong> {booking.seatLabel || `${booking.seatRow}${booking.seatNumber}`}</p>
+                    <p><strong>Thời gian đặt:</strong> {booking.bookingTime ? formatDate(booking.bookingTime) : '—'}</p>
+                    {booking.checkInTime && (
+                      <p><strong>Check-in:</strong> {formatDate(booking.checkInTime)}</p>
                     )}
-                    {booking.notes && (
-                      <p><strong>Ghi chú:</strong> {booking.notes}</p>
+                    {booking.checkOutTime && (
+                      <p><strong>Check-out:</strong> {formatDate(booking.checkOutTime)}</p>
+                    )}
+                    {booking.qrCode && (
+                      <div className="qr-wrapper">
+                        <img src={booking.qrCode} alt={`QR ${booking.seatLabel || booking.seatId}`} />
+                      </div>
                     )}
                   </div>
-                  
-                  <div className="d-flex gap-2 mt-3">
-                    <Button 
-                      variant="outline-primary" 
-                      size="sm"
-                      onClick={() => window.location.href = `/bookings/${booking.bookingId}`}
-                    >
-                      Xem chi tiết
-                    </Button>
-                    {booking.status === 'CONFIRMED' && (
-                      <Button 
-                        variant="outline-danger" 
-                        size="sm"
-                        onClick={() => {
-                          if (confirm('Bạn có chắc muốn hủy đặt chỗ này?')) {
-                            dispatch(cancelBooking(booking.bookingId));
-                          }
-                        }}
-                      >
-                        Hủy đặt chỗ
-                      </Button>
-                    )}
-                  </div>
+
                 </CardContent>
               </Card>
             </div>
@@ -128,12 +99,13 @@ const BookingHistory = () => {
         </div>
       ) : (
         <Card>
-          <CardContent className="text-center py-5">
-            <i className="bi bi-calendar-x" style={{ fontSize: '3rem', color: '#6c757d' }}></i>
-            <h4 className="mt-3">Chưa có đặt chỗ nào</h4>
-            <p className="text-muted">Bạn chưa có đặt chỗ nào. Hãy tham gia các sự kiện để đặt chỗ!</p>
+          <CardContent className="text-center py-5 empty-state">
+            <i className="bi bi-calendar-x"></i>
+            <h4>Chưa có đặt chỗ nào</h4>
+            <p>Hãy khám phá các sự kiện đang diễn ra và đặt chỗ ngay!</p>
             <Button 
-              variant="primary"
+              variant="custom"
+              className="cta-gradient"
               onClick={() => window.location.href = '/events'}
             >
               Xem sự kiện

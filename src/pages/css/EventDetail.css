@@ -112,6 +112,15 @@
 }
 
 /* Main Content */
+.event-detail-page .container {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+.event-detail-page .container > .row {
+  align-items: flex-start;
+}
+
 .event-section {
   margin-bottom: 2rem;
   border: none;
@@ -179,7 +188,25 @@
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
   border-radius: 1rem;
   overflow: hidden;
+}
+
+.booking-card.sticky-top {
+  position: sticky;
   top: 2rem;
+  align-self: flex-start;
+  z-index: 10;
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+}
+
+/* Ensure booking card doesn't get cut off */
+.event-detail-page .col-lg-4 {
+  display: flex;
+  flex-direction: column;
+}
+
+.event-detail-page .col-lg-4 > .booking-card {
+  flex-shrink: 0;
 }
 
 .booking-info {

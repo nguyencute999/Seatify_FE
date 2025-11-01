@@ -1,6 +1,30 @@
 import api from './apiService';
 
 const bookingService = {
+  // Thống kê đặt chỗ của user
+  getUserBookingStats: async () => {
+    try {
+      const response = await api.get('/user/bookings/stats');
+      return response;
+    } catch (error) {
+      console.error('Get booking stats error:', error);
+      console.error('Error response:', error.response?.data);
+      throw error;
+    }
+  },
+
+  // Lịch sử đặt chỗ của user
+  getUserBookingHistory: async () => {
+    try {
+      const response = await api.get('/user/bookings/history');
+      return response;
+    } catch (error) {
+      console.error('Get booking history error:', error);
+      console.error('Error response:', error.response?.data);
+      throw error;
+    }
+  },
+
   // Tạo đặt chỗ mới
   createBooking: async (bookingData) => {
     console.log('Creating booking with data:', bookingData);

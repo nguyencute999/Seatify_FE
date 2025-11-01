@@ -60,6 +60,56 @@ const AboutPage = () => {
     { year: 'Q4 2026', event: 'Mở rộng toàn trường', description: 'Triển khai cho tất cả sự kiện FPT' }
   ];
 
+  // Animated counter that starts when the element becomes visible
+  const AnimatedCounter = ({ target, duration = 1500, prefix = '', suffix = '', decimals = 0 }) => {
+    const [currentValue, setCurrentValue] = React.useState(0);
+    const containerRef = React.useRef(null);
+    const hasStartedRef = React.useRef(false);
+
+    React.useEffect(() => {
+      const element = containerRef.current;
+      if (!element) return;
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting && !hasStartedRef.current) {
+              hasStartedRef.current = true;
+              const startTime = performance.now();
+
+              const tick = (now) => {
+                const progress = Math.min((now - startTime) / duration, 1);
+                // Ease-out cubic for a smoother finish
+                const eased = 1 - Math.pow(1 - progress, 3);
+                setCurrentValue(target * eased);
+                if (progress < 1) requestAnimationFrame(tick);
+              };
+
+              requestAnimationFrame(tick);
+            }
+          });
+        },
+        { threshold: 0.3 }
+      );
+
+      observer.observe(element);
+      return () => observer.disconnect();
+    }, [target, duration]);
+
+    const numericValue = decimals > 0
+      ? Number(currentValue.toFixed(decimals))
+      : Math.round(currentValue);
+
+    const formatted = numericValue.toLocaleString(undefined, {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals
+    });
+
+    return (
+      <span ref={containerRef}>{`${prefix}${formatted}${suffix}`}</span>
+    );
+  };
+
   return (
     <div className="about-page">
       {/* Hero Section */}
@@ -69,7 +119,7 @@ const AboutPage = () => {
         </h1>
         <p className="hero-description">
           SEATIFY là giải pháp check-in thông minh được phát triển bởi sinh viên FPT University, 
-          nhằm giải quyết các vấn đề trong việc điểm danh và quản lý chỗ ngồi tại các sự kiện seminar.
+          nhằm giải quyết các vấn đề trong việc điểm danh và quản lý chỗ ngồi tại các sự kiện.
         </p>
       </section>
 
@@ -231,6 +281,7 @@ const AboutPage = () => {
               <span className="tech-badge">React.js</span>
               <span className="tech-badge">CSS</span>
               <span className="tech-badge">JavaScript</span>
+              <span className="tech-badge">Bootrap</span>
             </div>
           </div>
 
@@ -239,7 +290,7 @@ const AboutPage = () => {
             <div className="tech-badges">
               <span className="tech-badge">Spring Boot</span>
               {/* <span className="tech-badge">Firebase</span> */}
-              <span className="tech-badge">QR Code API</span>
+              <span className="tech-badge">QRCode Google.zxing</span>
             </div>
           </div>
 
@@ -435,19 +486,19 @@ const AboutPage = () => {
 
         <div className="stats-grid">
           <div className="stat-item">
-            <div className="stat-number">156+</div>
+            <div className="stat-number"><AnimatedCounter target={156} suffix="+" duration={1400} /></div>
             <p className="stat-label">Sự kiện đã tổ chức</p>
           </div>
           <div className="stat-item">
-            <div className="stat-number">12,450+</div>
+            <div className="stat-number"><AnimatedCounter target={12450} suffix="+" duration={1600} /></div>
             <p className="stat-label">Sinh viên sử dụng</p>
           </div>
           <div className="stat-item">
-            <div className="stat-number">99.8%</div>
+            <div className="stat-number"><AnimatedCounter target={99.8} suffix="%" decimals={1} duration={1700} /></div>
             <p className="stat-label">Độ chính xác</p>
           </div>
           <div className="stat-item">
-            <div className="stat-number">{'< 5s'}</div>
+            <div className="stat-number"><AnimatedCounter prefix="< " target={5} suffix="s" duration={1300} decimals={1} /></div>
             <p className="stat-label">Thời gian check-in</p>
           </div>
         </div>

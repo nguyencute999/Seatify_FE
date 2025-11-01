@@ -1,7 +1,29 @@
 import apiService from './apiService';
 
 const newsService = {
-  // Get all news with pagination
+  // Get all published news (public API)
+  async getAllPublishedNews() {
+    try {
+      const response = await apiService.get('/news');
+      return response;
+    } catch (error) {
+      console.error('Error fetching published news:', error);
+      throw error;
+    }
+  },
+
+  // Get news by ID (public API)
+  async getPublishedNewsById(newsId) {
+    try {
+      const response = await apiService.get(`/news/${newsId}`);
+      return response;
+    } catch (error) {
+      console.error('Error fetching news by ID:', error);
+      throw error;
+    }
+  },
+
+  // Get all news with pagination (deprecated - use getAllPublishedNews)
   async getNews(page = 0, size = 10) {
     try {
       const response = await apiService.get(`/news?page=${page}&size=${size}`);
@@ -12,7 +34,7 @@ const newsService = {
     }
   },
 
-  // Get news by ID
+  // Get news by ID (deprecated - use getPublishedNewsById)
   async getNewsById(newsId) {
     try {
       const response = await apiService.get(`/news/${newsId}`);

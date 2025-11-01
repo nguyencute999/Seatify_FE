@@ -2,10 +2,9 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
-import HeroHoverCard from '../../components/ui/HeroHoverCard.jsx';
 import { Badge } from '../../components/ui/Badge';
 import EventCarousel from '../../components/EventCarousel';
-import { fetchEvents } from '../../redux/event/eventSlice';
+import { fetchEvents, fetchFeaturedEvents } from '../../redux/event/eventSlice';
 import '../css/HomePage.css';
 
 const Home = ({ onViewChange = () => {} }) => {
@@ -21,17 +20,28 @@ const Home = ({ onViewChange = () => {} }) => {
   } = useSelector(state => state.events);
 
   useEffect(() => {
+    // Fetch featured events from API
+    dispatch(fetchFeaturedEvents());
+    // Fetch all events for other categories
     dispatch(fetchEvents());
   }, [dispatch]);
 
   const handleBookNow = (event) => {
-    console.log('Book now:', event);
-    navigate('/events');
+    const id = event?.eventId || event?.event_id || event?.id;
+    if (!id) {
+      navigate('/events');
+      return;
+    }
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+    navigate(`/events/${id}/seats`);
   };
 
   const handleViewDetails = (event) => {
-    console.log('View details:', event);
-    navigate('/events');
+    const id = event?.eventId || event?.event_id || event?.id;
+    navigate(id ? `/events/${id}` : '/events');
   };
 
   const handleLogin = () => {
@@ -45,11 +55,10 @@ const Home = ({ onViewChange = () => {} }) => {
   return (
     <>
       {/* Hero Section */}
-      <div className="position-relative container-fluid px-0 py-5">
+      <div className="position-relative container-fluid px-4 py-5 py-md-5 orange-theme">
         <div className="row justify-content-center">
           <div className="col-12 col-lg-8">
-            <HeroHoverCard>
-              <div className="hero-section">
+                          <div className="hero-section">
               <Badge 
                 variant="custom" 
                 className="mb-3 px-3 py-2 text-white border-0 hero-badge"
@@ -95,8 +104,7 @@ const Home = ({ onViewChange = () => {} }) => {
                 )}
               </div>
             </div>
-          </HeroHoverCard>
-          </div>
+                    </div>
         </div>
       </div>
 

@@ -1,6 +1,19 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import bookingService from '../../services/bookingService';
 
+// Lịch sử đặt chỗ của user
+export const getUserBookingHistory = createAsyncThunk(
+  'booking/getUserBookingHistory',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await bookingService.getUserBookingHistory();
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || { message: 'Server error' });
+    }
+  }
+);
+
 // Tạo đặt chỗ mới
 export const createBooking = createAsyncThunk(
   'booking/createBooking',
@@ -115,6 +128,20 @@ const bookingSlice = createSlice({
       .addCase(getUserBookings.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message || 'Không thể tải danh sách đặt chỗ';
+      })
+
+      // Get User Booking History
+      .addCase(getUserBookingHistory.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getUserBookingHistory.fulfilled, (state, action) => {
+        state.loading = false;
+        state.bookings = action.payload;
+      })
+      .addCase(getUserBookingHistory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || 'Không thể tải lịch sử đặt chỗ';
       })
 
       // Get Booking By ID

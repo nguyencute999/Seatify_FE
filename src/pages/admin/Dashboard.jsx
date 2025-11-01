@@ -1,91 +1,33 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import {
+  fetchDashboardStats,
+  fetchRecentBookings,
+  fetchRecentEvents,
+} from '../../redux/admin/adminDashboardSlice';
 
 const Dashboard = () => {
-  const [stats, setStats] = useState({
-    totalUsers: 0,
-    totalEvents: 0,
-    totalBookings: 0,
-    totalRevenue: 0,
-    activeEvents: 0,
-    upcomingEvents: 0,
-    completedEvents: 0,
-    cancelledEvents: 0
-  });
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const {
+    stats,
+    recentBookings,
+    recentEvents,
+    statsLoading,
+    bookingsLoading,
+    eventsLoading,
+    error,
+  } = useSelector((state) => state.adminDashboard);
 
-  const [recentBookings, setRecentBookings] = useState([]);
-  const [recentEvents, setRecentEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
-
- 
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      setStats({
-        totalUsers: 1250,
-        totalEvents: 45,
-        totalBookings: 3200,
-        totalRevenue: 125000000, // VND
-        activeEvents: 8,
-        upcomingEvents: 12,
-        completedEvents: 20,
-        cancelledEvents: 5
-      });
+    // Fetch all dashboard data when component mounts
+    dispatch(fetchDashboardStats());
+    dispatch(fetchRecentBookings(10));
+    dispatch(fetchRecentEvents(10));
+  }, [dispatch]);
 
-      setRecentBookings([
-        {
-          id: 1,
-          user: 'Nguyễn Văn A',
-          event: 'Seminar AI & Machine Learning',
-          bookingTime: '2024-01-15 10:30:00',
-          status: 'BOOKED'
-        },
-        {
-          id: 2,
-          user: 'Trần Thị B',
-          event: 'Workshop React Development',
-          bookingTime: '2024-01-15 09:15:00',
-          status: 'CHECKED_IN'
-        },
-        {
-          id: 3,
-          user: 'Lê Văn C',
-          event: 'Conference Blockchain',
-          bookingTime: '2024-01-14 16:45:00',
-          status: 'BOOKED'
-        }
-      ]);
-
-      setRecentEvents([
-        {
-          id: 1,
-          name: 'Seminar AI & Machine Learning',
-          startTime: '2024-01-20 09:00:00',
-          capacity: 100,
-          booked: 85,
-          status: 'UPCOMING'
-        },
-        {
-          id: 2,
-          name: 'Workshop React Development',
-          startTime: '2024-01-18 14:00:00',
-          capacity: 50,
-          booked: 50,
-          status: 'ONGOING'
-        },
-        {
-          id: 3,
-          name: 'Conference Blockchain',
-          startTime: '2024-01-16 08:00:00',
-          capacity: 200,
-          booked: 180,
-          status: 'UPCOMING'
-        }
-      ]);
-
-
-      setLoading(false);
-    }, 1000);
-  }, []);
+  const loading = statsLoading || bookingsLoading || eventsLoading;
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('vi-VN', {
@@ -122,12 +64,20 @@ const Dashboard = () => {
     return texts[status] || status;
   };
 
-  if (loading) {
+  if (loading && !stats && recentBookings.length === 0 && recentEvents.length === 0) {
     return (
       <div className="d-flex justify-content-center align-items-center" style={{ height: '400px' }}>
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="alert alert-danger">
+        <strong>Lỗi:</strong> {error}
       </div>
     );
   }
@@ -145,7 +95,7 @@ const Dashboard = () => {
                     Tổng người dùng
                   </div>
                   <div className="h5 mb-0 font-weight-bold text-gray-800">
-                    {stats.totalUsers.toLocaleString()}
+                    {stats?.totalUsers?.toLocaleString() || 0}
                   </div>
                 </div>
                 <div className="col-auto">
@@ -165,7 +115,7 @@ const Dashboard = () => {
                     Tổng sự kiện
                   </div>
                   <div className="h5 mb-0 font-weight-bold text-gray-800">
-                    {stats.totalEvents}
+                    {stats?.totalEvents || 0}
                   </div>
                 </div>
                 <div className="col-auto">
@@ -185,7 +135,7 @@ const Dashboard = () => {
                     Tổng đặt chỗ
                   </div>
                   <div className="h5 mb-0 font-weight-bold text-gray-800">
-                    {stats.totalBookings.toLocaleString()}
+                    {stats?.totalBookings?.toLocaleString() || 0}
                   </div>
                 </div>
                 <div className="col-auto">
@@ -205,7 +155,7 @@ const Dashboard = () => {
                     Doanh thu
                   </div>
                   <div className="h5 mb-0 font-weight-bold text-gray-800">
-                    {formatCurrency(stats.totalRevenue)}
+                    {formatCurrency(stats?.totalRevenue || 0)}
                   </div>
                 </div>
                 <div className="col-auto">
@@ -228,7 +178,7 @@ const Dashboard = () => {
                     Sự kiện sắp diễn ra
                   </div>
                   <div className="h5 mb-0 font-weight-bold">
-                    {stats.upcomingEvents}
+                    {stats?.upcomingEvents || 0}
                   </div>
                 </div>
                 <div className="col-auto">
@@ -248,7 +198,7 @@ const Dashboard = () => {
                     Đang diễn ra
                   </div>
                   <div className="h5 mb-0 font-weight-bold">
-                    {stats.activeEvents}
+                    {stats?.activeEvents || 0}
                   </div>
                 </div>
                 <div className="col-auto">
@@ -268,7 +218,7 @@ const Dashboard = () => {
                     Đã hoàn thành
                   </div>
                   <div className="h5 mb-0 font-weight-bold">
-                    {stats.completedEvents}
+                    {stats?.completedEvents || 0}
                   </div>
                 </div>
                 <div className="col-auto">
@@ -288,7 +238,7 @@ const Dashboard = () => {
                     Đã hủy
                   </div>
                   <div className="h5 mb-0 font-weight-bold">
-                    {stats.cancelledEvents}
+                    {stats?.cancelledEvents || 0}
                   </div>
                 </div>
                 <div className="col-auto">
@@ -308,9 +258,12 @@ const Dashboard = () => {
           <div className="card shadow">
             <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
               <h6 className="m-0 font-weight-bold text-primary">Đặt chỗ gần đây</h6>
-              <a href="/admin/bookings" className="btn btn-sm btn-primary">
+              <button 
+                className="btn btn-sm btn-primary"
+                onClick={() => navigate('/admin/bookings')}
+              >
                 Xem tất cả
-              </a>
+              </button>
             </div>
             <div className="card-body">
               <div className="table-responsive">
@@ -324,20 +277,28 @@ const Dashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {recentBookings.map(booking => (
-                      <tr key={booking.id}>
-                        <td>{booking.user}</td>
-                        <td className="text-truncate" style={{ maxWidth: '150px' }} title={booking.event}>
-                          {booking.event}
-                        </td>
-                        <td>{formatDate(booking.bookingTime)}</td>
-                        <td>
-                          <span className={getStatusBadge(booking.status)}>
-                            {getStatusText(booking.status)}
-                          </span>
+                    {recentBookings.length === 0 ? (
+                      <tr>
+                        <td colSpan="4" className="text-center text-muted">
+                          {bookingsLoading ? 'Đang tải...' : 'Chưa có đặt chỗ nào'}
                         </td>
                       </tr>
-                    ))}
+                    ) : (
+                      recentBookings.map((booking) => (
+                        <tr key={booking.bookingId || booking.id}>
+                          <td>{booking.userName || booking.user?.fullName || booking.user}</td>
+                          <td className="text-truncate" style={{ maxWidth: '150px' }} title={booking.eventName || booking.event?.eventName || booking.event}>
+                            {booking.eventName || booking.event?.eventName || booking.event}
+                          </td>
+                          <td>{formatDate(booking.bookingTime || booking.createdAt)}</td>
+                          <td>
+                            <span className={getStatusBadge(booking.status)}>
+                              {getStatusText(booking.status)}
+                            </span>
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -350,9 +311,12 @@ const Dashboard = () => {
           <div className="card shadow">
             <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
               <h6 className="m-0 font-weight-bold text-primary">Sự kiện gần đây</h6>
-              <a href="/admin/events" className="btn btn-sm btn-primary">
+              <button 
+                className="btn btn-sm btn-primary"
+                onClick={() => navigate('/admin/events')}
+              >
                 Xem tất cả
-              </a>
+              </button>
             </div>
             <div className="card-body">
               <div className="table-responsive">
@@ -366,30 +330,38 @@ const Dashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {recentEvents.map(event => (
-                      <tr key={event.id}>
-                        <td className="text-truncate" style={{ maxWidth: '150px' }} title={event.name}>
-                          {event.name}
-                        </td>
-                        <td>{formatDate(event.startTime)}</td>
-                        <td>
-                          <div className="progress" style={{ height: '20px' }}>
-                            <div 
-                              className="progress-bar" 
-                              role="progressbar" 
-                              style={{ width: `${(event.booked / event.capacity) * 100}%` }}
-                            >
-                              {event.booked}/{event.capacity}
-                            </div>
-                          </div>
-                        </td>
-                        <td>
-                          <span className={getStatusBadge(event.status)}>
-                            {getStatusText(event.status)}
-                          </span>
+                    {recentEvents.length === 0 ? (
+                      <tr>
+                        <td colSpan="4" className="text-center text-muted">
+                          {eventsLoading ? 'Đang tải...' : 'Chưa có sự kiện nào'}
                         </td>
                       </tr>
-                    ))}
+                    ) : (
+                      recentEvents.map((event) => (
+                        <tr key={event.eventId || event.id}>
+                          <td className="text-truncate" style={{ maxWidth: '150px' }} title={event.eventName || event.name}>
+                            {event.eventName || event.name}
+                          </td>
+                          <td>{formatDate(event.startTime)}</td>
+                          <td>
+                            <div className="progress" style={{ height: '20px' }}>
+                              <div 
+                                className="progress-bar" 
+                                role="progressbar" 
+                                style={{ width: `${event.capacity > 0 ? ((event.bookedCount || event.booked || 0) / event.capacity) * 100 : 0}%` }}
+                              >
+                                {event.bookedCount || event.booked || 0}/{event.capacity || 0}
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <span className={getStatusBadge(event.status)}>
+                              {getStatusText(event.status)}
+                            </span>
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>

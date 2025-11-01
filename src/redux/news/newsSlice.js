@@ -2,6 +2,30 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import newsService from '../../services/newsService';
 
 // Async thunks
+export const fetchPublishedNews = createAsyncThunk(
+  'news/fetchPublishedNews',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await newsService.getAllPublishedNews();
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch published news');
+    }
+  }
+);
+
+export const fetchPublishedNewsById = createAsyncThunk(
+  'news/fetchPublishedNewsById',
+  async (newsId, { rejectWithValue }) => {
+    try {
+      const response = await newsService.getPublishedNewsById(newsId);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch news details');
+    }
+  }
+);
+
 export const fetchNews = createAsyncThunk(
   'news/fetchNews',
   async ({ page = 0, size = 10 } = {}, { rejectWithValue }) => {
@@ -130,7 +154,35 @@ const newsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Fetch news
+      // Fetch published news (public)
+      .addCase(fetchPublishedNews.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchPublishedNews.fulfilled, (state, action) => {
+        state.loading = false;
+        state.news = Array.isArray(action.payload) ? action.payload : [];
+      })
+      .addCase(fetchPublishedNews.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // Fetch published news by ID
+      .addCase(fetchPublishedNewsById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchPublishedNewsById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.currentNews = action.payload;
+      })
+      .addCase(fetchPublishedNewsById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // Fetch news (deprecated)
       .addCase(fetchNews.pending, (state) => {
         state.loading = true;
         state.error = null;

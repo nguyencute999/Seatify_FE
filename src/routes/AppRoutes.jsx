@@ -13,6 +13,7 @@ import EventSeatLayout from '../pages/user/EventSeatLayout';
 import Profile from '../pages/user/Profile';
 import UpdateProfile from '../pages/user/UpdateProfile';
 import ChangePassword from '../pages/user/ChangePassword';
+import BookingHistory from '../pages/user/BookingHistory';
 
 // Auth Pages
 import LoginPage from '../pages/auth/LoginPage';
@@ -28,6 +29,7 @@ import SeatLayout from '../pages/admin/SeatLayout';
 import ManageUsers from '../pages/admin/ManageUsers';
 import ManageBookings from '../pages/admin/ManageBookings';
 import Reports from '../pages/admin/Reports';
+import AdminNewsSlide from '../pages/admin/AdminNewsSlide';
 
 // Import NewsPage component
 import NewsPage from '../pages/NewsPage';
@@ -64,6 +66,11 @@ export default function AppRoutes() {
             <ChangePassword />
           </ProtectedRoute>
         } />
+        <Route path="booking-history" element={
+          <ProtectedRoute>
+            <BookingHistory />
+          </ProtectedRoute>
+        } />
       </Route>
       
       {/* Admin Routes */}
@@ -79,6 +86,7 @@ export default function AppRoutes() {
         <Route path="events/:eventId/seats" element={<SeatLayout />} />
         <Route path="users" element={<ManageUsers />} />
         <Route path="bookings" element={<ManageBookings />} />
+        <Route path="news" element={<AdminNewsSlide />} />
         <Route path="reports" element={<Reports />} />
       </Route>
       

@@ -4,11 +4,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { Badge } from '../../components/ui/Badge';
 import './css/Profile.css';
 import userService from '../../services/userService';
+import bookingService from '../../services/bookingService';
 
 const Profile = ({ user = null }) => {
   const [profile, setProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [bookingStats, setBookingStats] = useState({ totalParticipated: 0, presentCount: 0, absentCount: 0 });
+  const [isStatsLoading, setIsStatsLoading] = useState(true);
   const navigate = useNavigate();
 
   const defaultUser = null;
@@ -47,6 +50,31 @@ const Profile = ({ user = null }) => {
       isMounted = false;
     };
   }, [user]);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchStats = async () => {
+      try {
+        setIsStatsLoading(true);
+        const res = await bookingService.getUserBookingStats();
+        const data = res?.data || {};
+        const nextStats = {
+          totalParticipated: Number(data.totalParticipated) || 0,
+          presentCount: Number(data.presentCount) || 0,
+          absentCount: Number(data.absentCount) || 0,
+        };
+        if (isMounted) setBookingStats(nextStats);
+      } catch (err) {
+        if (isMounted) setBookingStats({ totalParticipated: 0, presentCount: 0, absentCount: 0 });
+      } finally {
+        if (isMounted) setIsStatsLoading(false);
+      }
+    };
+    fetchStats();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -171,7 +199,7 @@ const Profile = ({ user = null }) => {
               <div className="col-md-4 mb-3">
                 <Card className="profile-stat-card text-center">
                   <CardContent className="p-4">
-                    <div className="profile-stat-number text-primary">0</div>
+                    <div className="profile-stat-number text-primary">{isStatsLoading ? '…' : bookingStats.totalParticipated}</div>
                     <p className="profile-stat-label">Sự kiện tham gia</p>
                   </CardContent>
                 </Card>
@@ -179,7 +207,7 @@ const Profile = ({ user = null }) => {
               <div className="col-md-4 mb-3">
                 <Card className="profile-stat-card text-center">
                   <CardContent className="p-4">
-                    <div className="profile-stat-number text-success">0</div>
+                    <div className="profile-stat-number text-success">{isStatsLoading ? '…' : bookingStats.presentCount}</div>
                     <p className="profile-stat-label">Có mặt</p>
                   </CardContent>
                 </Card>
@@ -187,7 +215,7 @@ const Profile = ({ user = null }) => {
               <div className="col-md-4 mb-3">
                 <Card className="profile-stat-card text-center">
                   <CardContent className="p-4">
-                    <div className="profile-stat-number text-warning">0</div>
+                    <div className="profile-stat-number text-warning">{isStatsLoading ? '…' : bookingStats.absentCount}</div>
                     <p className="profile-stat-label">Vắng mặt</p>
                   </CardContent>
                 </Card>
@@ -195,7 +223,7 @@ const Profile = ({ user = null }) => {
             </div>
 
             {/* Attendance History */}
-            <Card className="profile-history-card">
+            {/* <Card className="profile-history-card">
               <CardHeader className="profile-card-header">
                 <CardTitle className="profile-card-title">
                   <i className="bi bi-award me-2"></i>
@@ -208,7 +236,7 @@ const Profile = ({ user = null }) => {
               <CardContent className="p-4">
                 <div className="profile-history-list text-muted">Chưa có dữ liệu.</div>
               </CardContent>
-            </Card>
+            </Card> */}
 
           </div>
         </div>
